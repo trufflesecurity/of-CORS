@@ -1,5 +1,5 @@
 # Creative Name Goes here
-~~~~~~~~~~~
+
 
 ## Steps
 
