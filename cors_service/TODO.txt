@@ -1,0 +1,2 @@
+- swap secret content out on deploy
+- add admin user on deploy

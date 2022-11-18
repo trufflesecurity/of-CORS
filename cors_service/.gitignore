@@ -1,0 +1,9 @@
+venv
+.idea
+.mypy_cache
+htmlcov
+.pytest_cache
+__pycache__
+.DS_Store
+.coverage
+db.sqlite3
