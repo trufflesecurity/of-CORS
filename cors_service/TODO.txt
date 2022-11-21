@@ -1,2 +1,6 @@
 - swap secret content out on deploy
 - add admin user on deploy
+- ensure allowed_hosts can be * in production
+- ensure session always created
+- better log output format (level, timestamp, color, etc)
+- convert from sublist3r to amass
