@@ -1,7 +1,10 @@
 import logging
 from typing import Any, Optional
 
-from django.core.management import BaseCommand, CommandParser
+from django.core.management import (  # type: ignore[attr-defined]
+    BaseCommand,
+    CommandParser,
+)
 
 from web.logic.targets import TargetManager
 

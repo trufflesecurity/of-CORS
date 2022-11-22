@@ -1,8 +1,9 @@
 import logging
+from typing import Optional
 from uuid import uuid4
 
 import requests
-import sublist3r
+import sublist3r  # type: ignore[import]
 from django.conf import settings
 from django.db.models import F, QuerySet
 from django.utils import timezone
@@ -14,6 +15,7 @@ from web.models.target import (
     TargetDomain,
     TargetSubdomain,
 )
+from web.util.domain import domain_to_all_subdomains
 
 logger = logging.getLogger(__name__)
 
@@ -105,6 +107,25 @@ class TargetManager:
             )
             target_subdomain.save()
         return target_domain
+
+    @staticmethod
+    def find_host_domain_for_requested_host(
+        requested_host: str,
+    ) -> tuple[bool, Optional[HostDomain]]:
+        """Parse the given HTTP_HOST value and attempt to find a HostDomain in our records that
+        match the value (or one of its subdomains). Return a tuple containing (1) a boolean indicating
+        whether a match was found and (2) the HostDomain if a match is found.
+        """
+        parts = domain_to_all_subdomains(to_parse=requested_host)
+        if len(parts) == 0:
+            return False, None
+        for cur_part in parts:
+            try:
+                host_domain = HostDomain.objects.get(domain=cur_part)
+                return True, host_domain
+            except HostDomain.DoesNotExist:
+                continue
+        return False, None
 
     @staticmethod
     def get_active_target_domains_for_host_domain(

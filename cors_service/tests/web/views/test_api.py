@@ -80,14 +80,22 @@ class TestCORSFailure:
             data={
                 "err_msg": "whoopsie daisy",
                 "duration": 0.8675309,
+                "location": "errywhere",
             },
+            HTTP_HOST="asd.com",
         )
-        assert r.status_code == 400
+        assert r.status_code == 201
 
     def test_cors_failure_no_err_msg(self, unauthed_client: Client) -> None:
         """Tests that cors_failure behaves as expected when it's missing the err_msg POST argument."""
         r = unauthed_client.post(
-            reverse("cors_failure"), data={"url": f.url(), "duration": 0.8675309}
+            reverse("cors_failure"),
+            data={
+                "url": f.url(),
+                "duration": 0.8675309,
+                "location": "errywhere",
+            },
+            HTTP_HOST="asd.com",
         )
         assert r.status_code == 400
 
@@ -98,7 +106,22 @@ class TestCORSFailure:
             data={
                 "url": f.url(),
                 "err_msg": "whoopsie daisy",
+                "location": "errywhere",
             },
+            HTTP_HOST="asd.com",
+        )
+        assert r.status_code == 400
+
+    def test_cors_failure_no_location(self, unauthed_client: Client) -> None:
+        """Tests that cors_failure behaves as expected when it's missing the location POST argument."""
+        r = unauthed_client.post(
+            reverse("cors_failure"),
+            data={
+                "url": f.url(),
+                "duration": 0.8675309,
+                "err_msg": "whoopsie daisy",
+            },
+            HTTP_HOST="asd.com",
         )
         assert r.status_code == 400
 
@@ -112,6 +135,7 @@ class TestCORSFailure:
                 "url": f.url(),
                 "err_msg": "whoopsie daisy",
                 "duration": 0.8675309,
+                "location": "errywhere",
             },
             HTTP_HOST="best.host.ever",
         )

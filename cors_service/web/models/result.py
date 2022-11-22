@@ -15,8 +15,8 @@ class CORSRequestResult(BaseModel):
         db_index=True,
     )
     url = models.URLField(
-        null=False,
-        blank=False,
+        null=True,
+        blank=True,
         help_text="The URL that was requested.",
     )
     url_domain = models.TextField(
@@ -44,6 +44,11 @@ class CORSRequestResult(BaseModel):
         null=True,
         blank=True,
         help_text="A string denoting the type of error that was observed when a fetch was attempted of the URL.",
+    )
+    err_location = models.TextField(
+        null=True,
+        blank=True,
+        help_text="The location where the error was thrown (if an error was thrown).",
     )
     client_meta = models.JSONField(
         null=True,

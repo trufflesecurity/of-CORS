@@ -5,3 +5,7 @@
 - better log output format (level, timestamp, color, etc)
 - convert from sublist3r to amass
 - add disclaimer text for anyone reviewing payloads to know it's not harmful
+- add whitenoise for hosting in prod
+- add page for testing that server is running
+- include status code in success
+- add timeout for fetch

@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 from urllib.parse import urlparse
 
 from web.models.result import CORSRequestResult
@@ -36,9 +36,10 @@ class ResultManager:
     @staticmethod
     def accept_failure(
         host: str,
-        fetched_url: str,
         err_msg: str,
+        err_location: str,
         duration: float,
+        fetched_url: Optional[str],
         request_meta: dict[str, Any],
     ) -> CORSRequestResult:
         """Record that a CORS request failed for the given URL and reason. Return the associated
@@ -50,6 +51,7 @@ class ResultManager:
             url=fetched_url,
             url_domain=parsed.netloc,
             err_msg=err_msg,
+            err_location=err_location,
             duration=duration,
             success=True,
             client_meta=request_meta,
