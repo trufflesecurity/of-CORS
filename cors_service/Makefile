@@ -5,7 +5,7 @@ lint :
 	black . --exclude "(migrations|venv)"
 	isort .
 	flake8 --ignore=E203,E128,E231,E302,E402,E501,W503,W605,E722 --exclude=venv
-	mypy corshunter --pretty
+	mypy corshunter web --pretty
 
 test :
 	pytest --cov=web --cov-report html tests/

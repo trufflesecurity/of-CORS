@@ -41,7 +41,8 @@ def cors_success(request: Request) -> Response:
 class CORSFailureRequestSerializer(serializers.Serializer):
     """Request data serializer for the cors_failure endpoint."""
 
-    url = serializers.URLField(required=True, allow_null=False, allow_blank=False)
+    url = serializers.URLField(required=False, allow_null=True, allow_blank=True)
+    location = serializers.CharField(required=True, allow_blank=False, allow_null=False)
     err_msg = serializers.CharField(required=True, allow_blank=True, allow_null=False)
     duration = serializers.FloatField(required=True, allow_null=False)
 
@@ -53,8 +54,9 @@ def cors_failure(request: Request) -> Response:
     serializer.is_valid(raise_exception=True)
     ResultManager.accept_failure(
         host=get_request_host(request=request),
-        fetched_url=serializer.validated_data["url"],
+        fetched_url=serializer.validated_data.get("url"),
         err_msg=serializer.validated_data["err_msg"],
+        err_location=serializer.validated_data["location"],
         duration=serializer.validated_data["duration"],
         request_meta=get_request_metadata(request=request),
     )

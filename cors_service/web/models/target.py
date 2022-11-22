@@ -38,6 +38,11 @@ class HostDomain(BaseModel):
         db_index=True,
         unique=True,
     )
+    redirect_domain = models.TextField(
+        null=False,
+        blank=False,
+        help_text="The domain that should be redirected to when a request is received to this host domain.",
+    )
     targets = models.ManyToManyField(
         TargetDomain, related_name="hosts", through="HostToTargetMapping"
     )
