@@ -4,3 +4,4 @@
 - ensure session always created
 - better log output format (level, timestamp, color, etc)
 - convert from sublist3r to amass
+- add disclaimer text for anyone reviewing payloads to know it's not harmful
