@@ -24,7 +24,7 @@ jobs:
       - name: Lint
         run: cd cors_service && source venv/bin/activate && make lint_ci
 
-  test-python:
+  test:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
