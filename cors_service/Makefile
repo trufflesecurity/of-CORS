@@ -1,6 +1,12 @@
 SHELL := /bin/sh
 DIR := ${CURDIR}
 
+lint_ci :
+	black . --exclude "(migrations|venv)" --check
+	isort . --check-only
+	flake8 --ignore=E203,E128,E231,E302,E402,E501,W503,W605,E722 --exclude=venv
+	mypy corshunter web --pretty
+
 lint :
 	black . --exclude "(migrations|venv)"
 	isort .
