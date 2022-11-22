@@ -14,7 +14,7 @@ update_requirements :
 	pip freeze > requirements.txt
 
 make_migrations :
-	python manage.py makemigrations shield
+	python manage.py makemigrations web
 
 migrate : make_migrations
 	python manage.py migrate
