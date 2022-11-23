@@ -1,15 +1,17 @@
+from uuid import uuid4
+
 from django.test.client import Client
 from django.urls import reverse
+from django.utils import timezone
 from faker import Faker
 
-from tests.factories import HostDomainFactory, get_populated_host_domain
+from tests.factories import (
+    AuthTicketFactory,
+    HostDomainFactory,
+    get_populated_host_domain,
+)
 
 f = Faker()
-
-
-def test_index(unauthed_client: Client) -> None:
-    r = unauthed_client.get(reverse("web_index"))
-    assert r.status_code == 200
 
 
 class TestLanding:
@@ -162,3 +164,34 @@ class TestSwJsPayload:
             reverse("sw_payload"), HTTP_HOST=f"foo.bar.baz.{host_domain.domain}"
         )
         assert r.status_code == 200
+
+
+class TestConsumeAuthTicket:
+    """Container class for all tests for the consume_auth_ticket handler."""
+
+    def test_ticket_not_found(self, unauthed_client: Client) -> None:
+        """Tests that consume_auth_ticket behaves as expected when the referenced GUID does not map to
+        a ticket.
+        """
+        r = unauthed_client.get(
+            reverse(viewname="consume_auth_ticket", kwargs={"ticket_guid": uuid4()})
+        )
+        assert r.status_code == 400
+
+    def test_ticket_not_valid(self, unauthed_client: Client) -> None:
+        """Tests that consume_auth_ticket behaves as expected when the ticket mapped to the given GUID
+        is no longer valid.
+        """
+        ticket = AuthTicketFactory(used=True, used_at=timezone.now())
+        r = unauthed_client.get(
+            reverse(viewname="consume_auth_ticket", kwargs={"ticket_guid": ticket.guid})
+        )
+        assert r.status_code == 400
+
+    def test_success(self, unauthed_client: Client) -> None:
+        """Tests that consume_auth_ticket behaves as expected when the ticket mapped is still valid."""
+        ticket = AuthTicketFactory(used=False, used_at=None)
+        r = unauthed_client.get(
+            reverse(viewname="consume_auth_ticket", kwargs={"ticket_guid": ticket.guid})
+        )
+        assert r.status_code == 302

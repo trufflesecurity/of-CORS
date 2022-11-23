@@ -1,17 +1,37 @@
-from typing import Any, Optional
+from functools import wraps
+from typing import Any, Callable, Final, Optional
+from uuid import UUID
 
 from django.conf import settings
+from django.core.exceptions import SuspiciousOperation
 from django.http import Http404, HttpRequest, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
+from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 
+from web.logic.auth import AuthManager
 from web.logic.targets import TargetManager
+from web.models.result import CORSRequestResult
 from web.models.target import HostDomain
+from web.util.filters import CORSRequestResultFilter
 from web.util.request import get_redirect_target_from_request, get_request_host
+from web.util.tables import CORSRequestResultTable, FilteredSingleTableView
+
+SESSION_AUTH_KEY: Final[str] = "AUTHED"
 
 
-def index(request: HttpRequest) -> HttpResponse:
-    return HttpResponse("Hello world")
+def requires_auth(fn: Callable) -> Callable:
+    """Custom view decorator that will hide any protected pages if the SESSION_AUTH_KEY defined above
+    is not found in the requesting user's session.
+    """
+
+    @wraps(fn)
+    def wrap(request: HttpRequest, *args: Any, **kwargs: Any) -> Any:
+        if not request.session.get(SESSION_AUTH_KEY):
+            raise Http404()
+        return fn(request, *args, **kwargs)
+
+    return wrap
 
 
 def _should_render_for_host(request: HttpRequest) -> tuple[bool, Optional[HostDomain]]:
@@ -136,9 +156,50 @@ def sw_js_payload(request: HttpRequest) -> HttpResponse:
     )
 
 
-def service_worker_payload(request: HttpRequest) -> HttpResponse:
-    """Generate and serve the service worker payload for the subdomains mapped to the
-    host present in the given HTTP request.
+@method_decorator(requires_auth, name="dispatch")
+class CORSRequestResultListView(FilteredSingleTableView):
+    """Page for viewing all of the CORSRequestResult objects sitting in the database."""
+
+    model = CORSRequestResult
+    table_class = CORSRequestResultTable
+    template_name = "web/generic_table.html"
+    filterset_class = CORSRequestResultFilter
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        to_return = super().get_context_data(**kwargs)
+        to_return["title"] = "CORS Scan Results"
+        return to_return
+
+
+@requires_auth
+def view_html_content(request: HttpRequest, result_id: int) -> HttpResponse:
+    """Render a page that displays the HTML content from the referenced CORSRequestResult record."""
+    try:
+        record = CORSRequestResult.objects.get(id=result_id)
+    except CORSRequestResult.DoesNotExist:
+        raise Http404()
+    if not record.success:
+        raise SuspiciousOperation(
+            "That record was not successful (ie: fetch did not retrieve HTML)."
+        )
+    if not record.content:
+        raise SuspiciousOperation(
+            "That record does not have HTML content for some reason..."
+        )
+    return render(
+        request=request,
+        template_name="web/show_html_content.html",
+        context={
+            "record": record,
+        },
+    )
+
+
+def consume_auth_ticket(request: HttpRequest, ticket_guid: UUID) -> HttpResponse:
+    """Attempt to consume the auth ticket referenced by the given GUID. If successful redirect to the
+    results viewing page.
     """
-    TargetManager.get_all_internal_subdomains_for_parent_domain(parent_domain="foo")
-    return HttpResponse("Hello world")
+    if not AuthManager.use_auth_ticket(guid=ticket_guid):
+        raise SuspiciousOperation("Invalid ticket")
+    request.session[SESSION_AUTH_KEY] = True
+    return redirect("cors_request_results_table", permanent=False)

@@ -19,6 +19,11 @@ def get_client_ip(request: DjangoRequest) -> Optional[str]:
     return ip
 
 
+def get_client_user_agent(request: DjangoRequest) -> Optional[str]:
+    """Get the contents of the User-Agent header in the request if such a header exists."""
+    return request.META.get("HTTP_USER_AGENT")
+
+
 def get_request_host(request: DjangoRequest) -> str:
     """Get the contents of the HTTP Host header in the request."""
     return request.META["HTTP_HOST"]
@@ -30,7 +35,7 @@ def get_request_metadata(request: DjangoRequest) -> dict[str, Any]:
     """
     return {
         "ip": get_client_ip(request=request),
-        "user_agent": request.META.get("HTTP_USER_AGENT"),
+        "user_agent": get_client_user_agent(request=request),
     }
 
 

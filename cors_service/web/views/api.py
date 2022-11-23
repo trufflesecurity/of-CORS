@@ -4,13 +4,8 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from web.logic.results import ResultManager
-from web.util.request import get_request_host, get_request_metadata
+from web.util.request import get_client_ip, get_client_user_agent, get_request_host
 from web.util.string import can_base64_decode
-
-
-@api_view(["GET"])
-def index(request: Request) -> Response:
-    return Response({"hello": "world"})
 
 
 class CORSSuccessRequestSerializer(serializers.Serializer):
@@ -35,7 +30,8 @@ def cors_success(request: Request) -> Response:
         content=serializer.validated_data["content"],
         duration=serializer.validated_data["duration"],
         status_code=serializer.validated_data["status"],
-        request_meta=get_request_metadata(request=request),
+        user_agent=get_client_user_agent(request=request),
+        user_ip=get_client_ip(request=request),
     )
     return Response(status=201)
 
@@ -60,6 +56,7 @@ def cors_failure(request: Request) -> Response:
         err_msg=serializer.validated_data["err_msg"],
         err_location=serializer.validated_data["location"],
         duration=serializer.validated_data["duration"],
-        request_meta=get_request_metadata(request=request),
+        user_agent=get_client_user_agent(request=request),
+        user_ip=get_client_ip(request=request),
     )
     return Response(status=201)

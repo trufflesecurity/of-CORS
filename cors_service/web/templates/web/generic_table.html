@@ -1,0 +1,39 @@
+{% load render_table from django_tables2 %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+    <style>
+
+        body {
+            margin: 20px;
+        }
+
+        #form-container {
+            padding: 0px 10px 10px;
+        }
+
+        #form-container input,select {
+            margin-right: 20px;
+        }
+
+        tr.odd {
+            background-color: #f0f0f0;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="form-container">
+        <form method="get">
+            {{ filter.form }}
+            <input type="submit"/>
+        </form>
+    </div>
+    <div id="table-container">
+        {% render_table table %}
+    </div>
+</body>
+</html>

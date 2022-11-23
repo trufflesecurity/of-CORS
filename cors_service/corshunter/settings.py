@@ -14,7 +14,6 @@ import sys
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-from uuid import uuid4
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -23,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "-".join([str(uuid4()) for i in range(3)])
+SECRET_KEY = os.getenv("SECRET_KEY", "e6bc26ad-5398-4388-bd0e-9c71cc6b80d0")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -43,6 +42,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "web",
     "corsheaders",
+    "django_tables2",
+    "django_filters",
 ]
 
 MIDDLEWARE = [
@@ -69,6 +70,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "django.template.context_processors.request",
             ],
         },
     },
@@ -163,3 +165,9 @@ JS_REDIRECT_MS = int(os.getenv("JS_REDIRECT_MS", 1_000))
 # https://github.com/adamchainz/django-cors-headers#configuration
 
 CORS_ALLOW_ALL_ORIGINS = os.getenv("CORS_ALLOW_ALL_ORIGINS", "1") == "1"
+
+# Authentication
+
+AUTH_TICKET_VALID_WINDOW_S = int(
+    os.getenv("AUTH_TICKET_VALID_WINDOW_S", 60 * 5)
+)  # 5 minutes
