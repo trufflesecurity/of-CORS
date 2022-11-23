@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
+import multiprocessing
 import os
 import sys
 from pathlib import Path
@@ -154,8 +155,10 @@ LOGGING = {
 
 # Target enumeration
 
-HTTPS_TESTING_POOL_SIZE = int(os.getenv("HTTPS_TESTING_POOL_SIZE", 4))
-HTTPS_TESTING_TIMEOUT = int(os.getenv("HTTPS_TESTING_TIMEOUT", 5))
+HTTPS_TESTING_POOL_SIZE = int(
+    os.getenv("HTTPS_TESTING_POOL_SIZE", multiprocessing.cpu_count())
+)
+HTTPS_TESTING_TIMEOUT = int(os.getenv("HTTPS_TESTING_TIMEOUT", 1.25))
 
 # JS Payload
 
@@ -171,3 +174,22 @@ CORS_ALLOW_ALL_ORIGINS = os.getenv("CORS_ALLOW_ALL_ORIGINS", "1") == "1"
 AUTH_TICKET_VALID_WINDOW_S = int(
     os.getenv("AUTH_TICKET_VALID_WINDOW_S", 60 * 5)
 )  # 5 minutes
+
+# Amass Integration
+
+AMASS_LINUX_I386_DIR = "linux_i386"
+AMASS_LINUX_I386_BIN = "amass"
+AMASS_MACOS_AMD64_DIR = "macos_amd64"
+AMASS_MACOS_AMD64_BIN = "amass"
+AMASS_WINDOWS_AMD64_DIR = "windows_amd"
+AMASS_WINDOWS_AMD64_BIN = "amass.exe"
+
+_path_segments = []
+if sys.platform == "linux" or sys.platform == "linux2":
+    _path_segments = [AMASS_LINUX_I386_DIR, AMASS_LINUX_I386_BIN]
+elif sys.platform == "darwin":
+    _path_segments = [AMASS_MACOS_AMD64_DIR, AMASS_MACOS_AMD64_BIN]
+else:
+    # Assuming Windows here (this is incorrect but good enough for now)
+    _path_segments = [AMASS_WINDOWS_AMD64_DIR, AMASS_WINDOWS_AMD64_BIN]
+AMASS_BIN_PATH = os.path.join(BASE_DIR, "vendor", "amass", *_path_segments)
