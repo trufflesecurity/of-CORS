@@ -4,7 +4,17 @@ const redirectAway = () => {
     }, {{ redirect_ms }})
 }
 
-const reportSuccess = (url, content, duration) => {
+const emitDebug = (toPrint) => {
+    {% if print_debug %}
+    if (typeof toPrint === "string") {
+        console.log("[DEBUG] - ", toPrint);
+    } else {
+        console.log(toPrint);
+    }
+    {% endif %}
+}
+
+const reportSuccess = (url, content, duration, status) => {
     return fetch("{% url 'cors_success' %}", {
         method: "POST",
         mode: "same-origin",
@@ -17,11 +27,13 @@ const reportSuccess = (url, content, duration) => {
             "url": url,
             "content": content,
             "duration": duration,
+            "status": status,
         })
     })
 }
 
 const reportErr = (url, location, err, duration) => {
+    emitDebug("Got error at URL " + url + " (location '" + location + "'). Error was '" + err + "'");
     return fetch("{% url 'cors_failure' %}", {
         method: "POST",
         mode: "same-origin",
@@ -33,7 +45,7 @@ const reportErr = (url, location, err, duration) => {
         body: JSON.stringify({
             "url": url,
             "location": location,
-            "err_msg": err,
+            "err_msg": "" + err,
             "duration": duration,
         })
     })
