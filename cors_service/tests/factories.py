@@ -8,6 +8,7 @@ from django.utils import timezone
 from factory import SubFactory
 from factory.django import DjangoModelFactory
 
+from web.models.auth import AuthTicket
 from web.models.scan import ScanDomain, ScanSummary
 from web.models.target import (
     HostDomain,
@@ -137,3 +138,15 @@ class HostToTargetMappingFactory(BaseFactory):
 
     class Meta:
         model = HostToTargetMapping
+
+
+class AuthTicketFactory(BaseFactory):
+    """Factory class for generating new AuthTicket records."""
+
+    used = factory.sequence(_flip_coin)
+    used_at = factory.fuzzy.FuzzyDateTime(
+        start_dt=timezone.now(), end_dt=timezone.now() + timedelta(seconds=60)
+    )
+
+    class Meta:
+        model = AuthTicket

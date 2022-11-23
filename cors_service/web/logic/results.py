@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Optional
 from urllib.parse import urlparse
 
 from web.models.result import CORSRequestResult
@@ -16,7 +16,8 @@ class ResultManager:
         content: str,
         duration: float,
         status_code: int,
-        request_meta: dict[str, Any],
+        user_agent: Optional[str],
+        user_ip: Optional[str],
     ) -> CORSRequestResult:
         """Record that a successful CORS request was observed for the given URL. Return the associated
         database record once created.
@@ -29,7 +30,8 @@ class ResultManager:
             content=content,
             duration=duration,
             success=True,
-            client_meta=request_meta,
+            user_agent=user_agent,
+            user_ip=user_ip,
             status_code=status_code,
         )
         result.save()
@@ -42,7 +44,8 @@ class ResultManager:
         err_location: str,
         duration: float,
         fetched_url: Optional[str],
-        request_meta: dict[str, Any],
+        user_agent: Optional[str],
+        user_ip: Optional[str],
     ) -> CORSRequestResult:
         """Record that a CORS request failed for the given URL and reason. Return the associated
         database record once created.
@@ -55,8 +58,9 @@ class ResultManager:
             err_msg=err_msg,
             err_location=err_location,
             duration=duration,
-            success=True,
-            client_meta=request_meta,
+            success=False,
+            user_agent=user_agent,
+            user_ip=user_ip,
         )
         result.save()
         return result

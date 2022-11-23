@@ -7,11 +7,6 @@ from tests.factories import HostDomainFactory, get_populated_host_domain
 f = Faker()
 
 
-def test_index(unauthed_client: Client) -> None:
-    r = unauthed_client.get(reverse("web_index"))
-    assert r.status_code == 200
-
-
 class TestLanding:
     """Container class for all tests for the landing HTTP request handler."""
 

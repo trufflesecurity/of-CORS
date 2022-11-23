@@ -7,11 +7,6 @@ from faker import Faker
 f = Faker()
 
 
-def test_index(unauthed_client: Client) -> None:
-    r = unauthed_client.get(reverse("api_index"))
-    assert r.status_code == 200
-
-
 class TestCORSSuccess:
     """Container class for all unit tests related to the cors_success endpoint."""
 

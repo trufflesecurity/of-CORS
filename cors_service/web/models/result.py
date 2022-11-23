@@ -1,3 +1,6 @@
+from base64 import b64decode
+from typing import Optional
+
 from django.db import models
 
 from web.models.base import BaseModel
@@ -55,8 +58,20 @@ class CORSRequestResult(BaseModel):
         blank=True,
         help_text="The location where the error was thrown (if an error was thrown).",
     )
-    client_meta = models.JSONField(
+    user_agent = models.TextField(
         null=True,
         blank=True,
-        help_text="A blob of metadata describing the client that we received the request from.",
+        help_text="The user agent provided by the submitting user.",
     )
+    user_ip = models.GenericIPAddressField(
+        null=True,
+        blank=True,
+        help_text="The IP address provided by the submitting user.",
+    )
+
+    @property
+    def decoded_content(self) -> Optional[str]:
+        """Return the properly decoded HTML content of this record if the record has any content."""
+        if not self.content:
+            return None
+        return b64decode(self.content.encode("utf-8")).decode("utf-8")
