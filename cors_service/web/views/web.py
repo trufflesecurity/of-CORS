@@ -5,7 +5,7 @@ from uuid import UUID
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.http import Http404, HttpRequest, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 
@@ -202,4 +202,4 @@ def consume_auth_ticket(request: HttpRequest, ticket_guid: UUID) -> HttpResponse
     if not AuthManager.use_auth_ticket(guid=ticket_guid):
         raise SuspiciousOperation("Invalid ticket")
     request.session[SESSION_AUTH_KEY] = True
-    return HttpResponse("Hello World")
+    return redirect("cors_request_results_table", permanent=False)
