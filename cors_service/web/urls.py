@@ -9,5 +9,6 @@ urlpatterns = [
     path("assets/js/sw.js", web.sw_js_payload, name="sw_payload"),
     path("web", web.index, name="web_index"),
     path("api", api.index, name="api_index"),
+    path("debug", web.landing_debug, name="landing_debug"),
     path("", web.landing, name="landing"),
 ]

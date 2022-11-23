@@ -22,6 +22,7 @@ class TestCORSSuccess:
             data={
                 "content": b64encode("hello world".encode("utf-8")).decode("utf-8"),
                 "duration": 0.8675309,
+                "status": 200,
             },
         )
         assert r.status_code == 400
@@ -29,7 +30,12 @@ class TestCORSSuccess:
     def test_cors_success_no_content(self, unauthed_client: Client) -> None:
         """Tests that cors_success behaves as expected when it's missing the content POST argument."""
         r = unauthed_client.post(
-            reverse("cors_success"), data={"url": f.url(), "duration": 0.8675309}
+            reverse("cors_success"),
+            data={
+                "url": f.url(),
+                "duration": 0.8675309,
+                "status": 200,
+            },
         )
         assert r.status_code == 400
 
@@ -40,6 +46,19 @@ class TestCORSSuccess:
             data={
                 "url": f.url(),
                 "content": b64encode("hello world".encode("utf-8")).decode("utf-8"),
+                "status": 200,
+            },
+        )
+        assert r.status_code == 400
+
+    def test_cors_success_no_status(self, unauthed_client: Client) -> None:
+        """Tests that cors_success behaves as expected when it's missing the duration POST argument."""
+        r = unauthed_client.post(
+            reverse("cors_success"),
+            data={
+                "url": f.url(),
+                "content": b64encode("hello world".encode("utf-8")).decode("utf-8"),
+                "duration": 0.8675309,
             },
         )
         assert r.status_code == 400
@@ -64,6 +83,7 @@ class TestCORSSuccess:
                 "url": f.url(),
                 "content": b64encode("hello world".encode("utf-8")).decode("utf-8"),
                 "duration": 0.8675309,
+                "status": 200,
             },
             HTTP_HOST="best.host.ever",
         )

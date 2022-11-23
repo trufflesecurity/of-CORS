@@ -40,6 +40,11 @@ class CORSRequestResult(BaseModel):
         blank=True,
         help_text="Base64-encoded HTML content that was retrieved from the URL.",
     )
+    status_code = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text="The HTTP status code returned from requesting the associated URL.",
+    )
     err_msg = models.TextField(
         null=True,
         blank=True,

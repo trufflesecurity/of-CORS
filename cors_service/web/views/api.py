@@ -18,6 +18,7 @@ class CORSSuccessRequestSerializer(serializers.Serializer):
 
     url = serializers.URLField(required=True, allow_null=False, allow_blank=False)
     content = serializers.CharField(required=True, allow_blank=True, allow_null=False)
+    status = serializers.IntegerField(required=True, allow_null=False)
     duration = serializers.FloatField(required=True, allow_null=False)
 
 
@@ -33,6 +34,7 @@ def cors_success(request: Request) -> Response:
         fetched_url=serializer.validated_data["url"],
         content=serializer.validated_data["content"],
         duration=serializer.validated_data["duration"],
+        status_code=serializer.validated_data["status"],
         request_meta=get_request_metadata(request=request),
     )
     return Response(status=201)

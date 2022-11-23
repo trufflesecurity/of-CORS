@@ -36,8 +36,10 @@ def _should_render_for_host(request: HttpRequest) -> tuple[bool, Optional[HostDo
 def _get_js_context_for_request(
     request: HttpRequest,
     host_domain: HostDomain,
-    redirect_ms: int = settings.JS_REDIRECT_MS,
     include_payload_targets: bool = False,
+    auto_invoke: bool = True,
+    redirect_ms: int = settings.JS_REDIRECT_MS,
+    print_debug: bool = settings.DEBUG,
 ) -> dict[str, Any]:
     """Get the template rendering context for the JS payload from the given request and matching
     host domain.
@@ -49,6 +51,8 @@ def _get_js_context_for_request(
             to_domain=host_domain.redirect_domain,
         ),
         "redirect_ms": redirect_ms,
+        "auto_invoke": auto_invoke,
+        "print_debug": print_debug,
     }
     if include_payload_targets:
         to_return[
@@ -69,8 +73,30 @@ def landing(request: HttpRequest) -> HttpResponse:
         raise Http404()
     return render(
         request=request,
-        template_name="web/landing.html",
+        template_name="web/landing_sw.html",
         context={},
+    )
+
+
+def landing_debug(request: HttpRequest) -> HttpResponse:
+    """Attempt to serve up a debugging landing page for a host domain as configured within the
+    backing database. This debugging version is configured to run all of the CORS testing on the page
+    that is loaded rather than kicking off in a service worker and redirecting. Thus this is an easier
+    method for testing the proper configuration. If the request is to a domain that we do not have
+    configured as a host domain then we simply return a 404 not found."""
+    should_render, host_domain = _should_render_for_host(request=request)
+    if not should_render:
+        raise Http404()
+    assert host_domain is not None
+    return render(
+        request=request,
+        template_name="web/landing_debug.html",
+        context=_get_js_context_for_request(
+            request=request,
+            host_domain=host_domain,
+            auto_invoke=False,
+            include_payload_targets=True,
+        ),
     )
 
 

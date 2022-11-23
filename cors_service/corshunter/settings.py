@@ -42,11 +42,13 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "web",
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -156,3 +158,8 @@ HTTPS_TESTING_TIMEOUT = int(os.getenv("HTTPS_TESTING_TIMEOUT", 5))
 # JS Payload
 
 JS_REDIRECT_MS = int(os.getenv("JS_REDIRECT_MS", 1_000))
+
+# CORS Configuration
+# https://github.com/adamchainz/django-cors-headers#configuration
+
+CORS_ALLOW_ALL_ORIGINS = os.getenv("CORS_ALLOW_ALL_ORIGINS", "1") == "1"

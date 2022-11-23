@@ -15,6 +15,7 @@ class ResultManager:
         fetched_url: str,
         content: str,
         duration: float,
+        status_code: int,
         request_meta: dict[str, Any],
     ) -> CORSRequestResult:
         """Record that a successful CORS request was observed for the given URL. Return the associated
@@ -29,6 +30,7 @@ class ResultManager:
             duration=duration,
             success=True,
             client_meta=request_meta,
+            status_code=status_code,
         )
         result.save()
         return result
