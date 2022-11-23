@@ -305,15 +305,15 @@ class TestTargetManager:
         assert total_mapping_count == 5
         assert total_active_mapping_count == 3
 
-    @patch("web.logic.targets.TargetManager.enumerate_subdomains")
+    @patch("web.logic.amass.AmassManager.enumerate_subdomains_for_domain")
     @patch("web.logic.targets.TargetManager.test_domains_for_https")
     def test_scan_parent_domain_no_results(
-        self, test_domains_for_https, enumerate_subdomains
+        self, test_domains_for_https, enumerate_subdomains_for_domain
     ) -> None:
         """Tests scan_parent_domain to ensure that it creates all of the expected database records when
         no results are found from a subdomain scan.
         """
-        enumerate_subdomains.return_value = []
+        enumerate_subdomains_for_domain.return_value = []
         test_domains_for_https.return_value = []
         domain = f.domain_name()
         summary_count_1 = ScanSummary.objects.count()
@@ -326,16 +326,16 @@ class TestTargetManager:
         assert result.subdomains_count == 0
         assert result.https_subdomains_count == 0
 
-    @patch("web.logic.targets.TargetManager.enumerate_subdomains")
+    @patch("web.logic.amass.AmassManager.enumerate_subdomains_for_domain")
     @patch("web.logic.targets.TargetManager.test_domains_for_https")
     def test_scan_parent_domain_one_result_no_https(
-        self, test_domains_for_https, enumerate_subdomains
+        self, test_domains_for_https, enumerate_subdomains_for_domain
     ) -> None:
         """Tests scan_parent_domain to ensure that it creates all of the expected database records when
         a single result is found from a subdomain scan that doesn't respond to HTTPS.
         """
         subdomain = f.domain_name()
-        enumerate_subdomains.return_value = [subdomain]
+        enumerate_subdomains_for_domain.return_value = [subdomain]
         test_domains_for_https.return_value = []
         domain = f.domain_name()
         summary_count_1 = ScanSummary.objects.count()
@@ -354,16 +354,16 @@ class TestTargetManager:
         assert result.https_subdomains_count == 0
         assert payload_subdomains == [subdomain]
 
-    @patch("web.logic.targets.TargetManager.enumerate_subdomains")
+    @patch("web.logic.amass.AmassManager.enumerate_subdomains_for_domain")
     @patch("web.logic.targets.TargetManager.test_domains_for_https")
     def test_scan_parent_domain_one_result_https(
-        self, test_domains_for_https, enumerate_subdomains
+        self, test_domains_for_https, enumerate_subdomains_for_domain
     ) -> None:
         """Tests scan_parent_domain to ensure that it creates all of the expected database records when
         a single result is found from a subdomain scan that doesn't respond to HTTPS.
         """
         subdomain = f.domain_name()
-        enumerate_subdomains.return_value = [subdomain]
+        enumerate_subdomains_for_domain.return_value = [subdomain]
         test_domains_for_https.return_value = [subdomain]
         domain = f.domain_name()
         summary_count_1 = ScanSummary.objects.count()
@@ -382,16 +382,16 @@ class TestTargetManager:
         assert result.https_subdomains_count == 1
         assert payload_subdomains == []
 
-    @patch("web.logic.targets.TargetManager.enumerate_subdomains")
+    @patch("web.logic.amass.AmassManager.enumerate_subdomains_for_domain")
     @patch("web.logic.targets.TargetManager.test_domains_for_https")
     def test_scan_parent_domain_many_results_no_https(
-        self, test_domains_for_https, enumerate_subdomains
+        self, test_domains_for_https, enumerate_subdomains_for_domain
     ) -> None:
         """Tests scan_parent_domain to ensure that it creates all of the expected database records when
         many results are found from a subdomain scan and none respond to HTTPS.
         """
         subdomains = [f.domain_name() for _ in range(10)]
-        enumerate_subdomains.return_value = subdomains
+        enumerate_subdomains_for_domain.return_value = subdomains
         test_domains_for_https.return_value = []
         domain = f.domain_name()
         summary_count_1 = ScanSummary.objects.count()
@@ -410,10 +410,10 @@ class TestTargetManager:
         assert result.https_subdomains_count == 0
         assert payload_subdomains == subdomains
 
-    @patch("web.logic.targets.TargetManager.enumerate_subdomains")
+    @patch("web.logic.amass.AmassManager.enumerate_subdomains_for_domain")
     @patch("web.logic.targets.TargetManager.test_domains_for_https")
     def test_scan_parent_domain_many_results_some_https(
-        self, test_domains_for_https, enumerate_subdomains
+        self, test_domains_for_https, enumerate_subdomains_for_domain
     ) -> None:
         """Tests scan_parent_domain to ensure that it creates all of the expected database records when
         many results are found from a subdomain scan and some respond to HTTPS.
@@ -421,7 +421,7 @@ class TestTargetManager:
         subdomains = [f.domain_name() for _ in range(10)]
         https_subdomains = subdomains[:5]
         non_https_subdomains = subdomains[5:]
-        enumerate_subdomains.return_value = subdomains
+        enumerate_subdomains_for_domain.return_value = subdomains
         test_domains_for_https.return_value = https_subdomains
         domain = f.domain_name()
         summary_count_1 = ScanSummary.objects.count()
@@ -440,16 +440,16 @@ class TestTargetManager:
         assert result.https_subdomains_count == 5
         assert payload_subdomains == non_https_subdomains
 
-    @patch("web.logic.targets.TargetManager.enumerate_subdomains")
+    @patch("web.logic.amass.AmassManager.enumerate_subdomains_for_domain")
     @patch("web.logic.targets.TargetManager.test_domains_for_https")
     def test_scan_parent_domain_many_results_all_https(
-        self, test_domains_for_https, enumerate_subdomains
+        self, test_domains_for_https, enumerate_subdomains_for_domain
     ) -> None:
         """Tests scan_parent_domain to ensure that it creates all of the expected database records when
         many results are found from a subdomain scan and all respond to HTTPS.
         """
         subdomains = [f.domain_name() for _ in range(10)]
-        enumerate_subdomains.return_value = subdomains
+        enumerate_subdomains_for_domain.return_value = subdomains
         test_domains_for_https.return_value = subdomains
         domain = f.domain_name()
         summary_count_1 = ScanSummary.objects.count()
