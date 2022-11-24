@@ -2,7 +2,10 @@ import logging
 from typing import Any, Optional
 from uuid import uuid4
 
-from django.core.management import BaseCommand, CommandParser
+from django.core.management import (  # type: ignore[attr-defined]
+    BaseCommand,
+    CommandParser,
+)
 from django.utils import timezone
 
 from web.logic.targets import TargetManager
@@ -98,7 +101,7 @@ class Command(BaseCommand):
             )
             if sorted([x.domain for x in results]) != sorted(CORS_TARGET_SUBDOMAINS):
                 logger.fatal(f"Mapping was INVALID for domain '{domain}'. Exiting.")
-                return
+                return None
             else:
                 logger.info(f"Mapping is correct for domain '{domain}'.")
         target_desc = ", ".join([f"'{x}'" for x in local_domains])

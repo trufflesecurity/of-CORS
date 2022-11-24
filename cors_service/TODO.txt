@@ -11,3 +11,4 @@
 - remove default handlers and related tests [DONE]
 - ensure local CORS configuration is correct
 - fetch with credentials enabled AND without [OUTOFSCOPE]
+- have default landing page serve up payload

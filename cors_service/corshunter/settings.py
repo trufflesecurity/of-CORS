@@ -88,11 +88,12 @@ WSGI_APPLICATION = "corshunter.wsgi.application"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 MAX_CONN_AGE = 600
+DATABASES: dict[str, Any]
 
 if "DATABASE_URL" in os.environ:
     # https://github.com/heroku/python-getting-started/blob/main/gettingstarted/settings.py
 
-    DATABASES: dict[str, Any] = {
+    DATABASES = {
         "default": dj_database_url.config(conn_max_age=MAX_CONN_AGE, ssl_require=True)
     }
 
@@ -100,7 +101,7 @@ if "DATABASE_URL" in os.environ:
     if "CI" in os.environ:
         DATABASES["default"]["TEST"] = DATABASES["default"]
 else:
-    DATABASES: dict[str, Any] = {
+    DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": str(BASE_DIR / "db.sqlite3"),
