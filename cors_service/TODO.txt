@@ -1,13 +1,14 @@
 - swap secret content out on deploy
-- add admin user on deploy
+- add admin user on deploy [WONTDO]
 - ensure allowed_hosts can be * in production
 - ensure session always created
 - better log output format (level, timestamp, color, etc)
-- convert from sublist3r to amass
+- convert from sublist3r to amass [DONE]
 - add disclaimer text for anyone reviewing payloads to know it's not harmful
-- add whitenoise for hosting in prod
+- add whitenoise for hosting in prod [DONE]
 - add page for testing that server is running
-- add timeout for fetch
-- remove default handlers and related tests
+- add timeout for fetch [WONTDO]
+- remove default handlers and related tests [DONE]
 - ensure local CORS configuration is correct
-- fetch with credentials enabled AND without
+- fetch with credentials enabled AND without [OUTOFSCOPE]
+- have default landing page serve up payload

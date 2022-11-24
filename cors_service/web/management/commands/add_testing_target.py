@@ -2,7 +2,10 @@ import logging
 from typing import Any, Optional
 from uuid import uuid4
 
-from django.core.management import BaseCommand
+from django.core.management import (  # type: ignore[attr-defined]
+    BaseCommand,
+    CommandParser,
+)
 from django.utils import timezone
 
 from web.logic.targets import TargetManager
@@ -34,6 +37,17 @@ class Command(BaseCommand):
     testing configuration.
     """
 
+    def add_arguments(self, parser: CommandParser) -> None:
+        parser.add_argument(
+            "-d",
+            "--host-domains",
+            metavar="<HOSTS>",
+            type=str,
+            help="A comma-separate list of host domains that will receive HTTP traffic.",
+            required=False,
+            default=",".join(LOCAL_DOMAINS),
+        )
+
     def handle(self, *args: Any, **options: Any) -> Optional[str]:
         logger.info("Ensuring database has configuration for local testing...")
         try:
@@ -52,7 +66,8 @@ class Command(BaseCommand):
                 scan_guid=target_domain.last_scan_guid,
             )
         host_domains = []
-        for domain in LOCAL_DOMAINS:
+        local_domains = [x.strip() for x in options["host_domains"].split(",")]
+        for domain in local_domains:
             try:
                 host_domains.append(HostDomain.objects.get(domain=domain))
             except HostDomain.DoesNotExist:
@@ -78,7 +93,7 @@ class Command(BaseCommand):
         logger.info(
             "Records set up to reflect local testing setup. Ensuring mapping is correct..."
         )
-        for domain in LOCAL_DOMAINS:
+        for domain in local_domains:
             results = list(
                 TargetManager.get_active_target_subdomains_for_host_domain(
                     host_domain=domain
@@ -86,9 +101,10 @@ class Command(BaseCommand):
             )
             if sorted([x.domain for x in results]) != sorted(CORS_TARGET_SUBDOMAINS):
                 logger.fatal(f"Mapping was INVALID for domain '{domain}'. Exiting.")
+                return None
             else:
                 logger.info(f"Mapping is correct for domain '{domain}'.")
-        target_desc = ", ".join([f"'{x}'" for x in LOCAL_DOMAINS])
+        target_desc = ", ".join([f"'{x}'" for x in local_domains])
         logger.info(
             f"Everything looks good! This instance is now configured to launch the CORS scanner "
             f"for requests to the domains {target_desc}. Happy hunting!"

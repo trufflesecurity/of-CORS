@@ -27,3 +27,7 @@ migrate : make_migrations
 
 run_server :
 	python manage.py runserver 127.0.0.1:8080
+
+package_to_zip :
+	rm -rf package.tar.gz
+	tar -czvf package.tar.gz corshunter tests vendor web Makefile manage.py Procfile requirements.txt release-tasks.sh
