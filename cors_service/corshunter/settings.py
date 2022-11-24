@@ -15,6 +15,9 @@ import sys
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+from typing import Any
+
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -26,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY", "e6bc26ad-5398-4388-bd0e-9c71cc6b80d0")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("PROD", "0") == "0"
 
 ALLOWED_HOSTS: list[str] = ["*"]
 
@@ -49,6 +52,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -83,12 +87,25 @@ WSGI_APPLICATION = "corshunter.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+MAX_CONN_AGE = 600
+
+if "DATABASE_URL" in os.environ:
+    # https://github.com/heroku/python-getting-started/blob/main/gettingstarted/settings.py
+
+    DATABASES: dict[str, Any] = {
+        "default": dj_database_url.config(conn_max_age=MAX_CONN_AGE, ssl_require=True)
     }
-}
+
+    # Enable test database if found in CI environment.
+    if "CI" in os.environ:
+        DATABASES["default"]["TEST"] = DATABASES["default"]
+else:
+    DATABASES: dict[str, Any] = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": str(BASE_DIR / "db.sqlite3"),
+        }
+    }
 
 
 # Password validation
@@ -126,6 +143,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "web/staticfiles"  # destination of collectstatic
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+WHITENOISE_ALLOW_ALL_ORIGINS = True
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
