@@ -143,7 +143,7 @@ class TargetManager:
 
     @staticmethod
     def set_host_to_target_mapping(
-        host_domain: str, target_domains: list[str]
+        host_domain: str, redirect_domain: str, target_domains: list[str]
     ) -> HostDomain:
         """Configure things so that when the give host domain is requested, a payload is served up targeting
         all of the subdomains underneath the list of target_domains.
@@ -159,7 +159,12 @@ class TargetManager:
         HostToTargetMapping.objects.filter(host_domain__domain=host_domain).update(
             active=False
         )
-        host, _ = HostDomain.objects.update_or_create(domain=host_domain)
+        host, _ = HostDomain.objects.update_or_create(
+            domain=host_domain,
+            defaults={
+                "redirect_domain": redirect_domain,
+            },
+        )
         for cur_target in targets:
             HostToTargetMapping.objects.update_or_create(
                 host_domain=host,

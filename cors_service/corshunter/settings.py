@@ -214,3 +214,9 @@ else:
     # Assuming Windows here (this is incorrect but good enough for now)
     _path_segments = [AMASS_WINDOWS_AMD64_DIR, AMASS_WINDOWS_AMD64_BIN]
 AMASS_BIN_PATH = os.path.join(BASE_DIR, "vendor", "amass", *_path_segments)
+
+# Files
+
+FILES_DIR = os.getenv("FILES_DIR", "files")
+EXAMPLE_YML_FILE = os.getenv("EXAMPLE_YML_FILE", "example.yml")
+EXAMPLE_YML_FILE_PATH = os.path.join(BASE_DIR, FILES_DIR, EXAMPLE_YML_FILE)
