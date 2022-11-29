@@ -24,6 +24,14 @@ class Command(BaseCommand):
             required=True,
         )
         parser.add_argument(
+            "-r",
+            "--redirect_domain",
+            metavar="<REDIRECT_DOMAIN>",
+            type=str,
+            help="The domain that CORS Hunter will redirect to after launching the payload.",
+            required=True,
+        )
+        parser.add_argument(
             "-t",
             "--targets",
             metavar="<TARGETS>",
@@ -35,6 +43,7 @@ class Command(BaseCommand):
 
     def handle(self, *args: Any, **options: Any) -> Optional[str]:
         host_domain = options["host_domain"]
+        redirect_domain = options["redirect_domain"]
         targets = [x.strip() for x in options["targets"].split(",")]
         logger.info(
             f"Now adding the host domain of '{host_domain}' to CORS Hunter configuration."
@@ -49,7 +58,9 @@ class Command(BaseCommand):
             f"Now setting up the mapping from '{host_domain}' to the {len(targets)} targets..."
         )
         TargetManager.set_host_to_target_mapping(
-            host_domain=host_domain, target_domains=targets
+            host_domain=host_domain,
+            target_domains=targets,
+            redirect_domain=redirect_domain,
         )
         payload_subdomains = TargetManager.get_active_target_subdomains_for_host_domain(
             host_domain=host_domain

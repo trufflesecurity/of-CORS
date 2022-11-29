@@ -245,6 +245,7 @@ class TestTargetManager:
             TargetManager.set_host_to_target_mapping(
                 host_domain=f.domain_name(),
                 target_domains=[f.domain_name() for _ in range(3)],
+                redirect_domain="www.redirect.com",
             )
 
     def test_set_host_to_target_mapping_host_not_exist(self) -> None:
@@ -258,6 +259,7 @@ class TestTargetManager:
         TargetManager.set_host_to_target_mapping(
             host_domain=host_domain,
             target_domains=[x.domain for x in targets],
+            redirect_domain="www.redirect.com",
         )
         host_count_2 = HostDomain.objects.count()
         mapping_count_2 = HostToTargetMapping.objects.count()
@@ -281,12 +283,14 @@ class TestTargetManager:
         TargetManager.set_host_to_target_mapping(
             host_domain=host_domain,
             target_domains=[x.domain for x in targets_1],
+            redirect_domain="www.redirect.com",
         )
         host_count_1 = HostDomain.objects.count()
         mapping_count_1 = HostToTargetMapping.objects.count()
         TargetManager.set_host_to_target_mapping(
             host_domain=host_domain,
             target_domains=[x.domain for x in targets_2],
+            redirect_domain="www.redirect.com",
         )
         host_count_2 = HostDomain.objects.count()
         mapping_count_2 = HostToTargetMapping.objects.count()

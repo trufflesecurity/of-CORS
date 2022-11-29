@@ -3,7 +3,7 @@ import logging
 import yaml
 
 from web.logic.targets import TargetManager
-from web.models.target import TargetDomain
+from web.models.target import HostToTargetMapping, TargetDomain
 
 logger = logging.getLogger(__name__)
 
@@ -48,6 +48,7 @@ class YmlManager:
         logger.debug(
             "All target domains populated successfully! Now setting up host to target mappings..."
         )
+        HostToTargetMapping.objects.update(active=False)
         for k, v in hosts.items():
             host_domain = v["host_domain"]
             TargetManager.set_host_to_target_mapping(
