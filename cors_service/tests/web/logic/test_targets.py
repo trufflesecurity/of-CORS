@@ -471,3 +471,35 @@ class TestTargetManager:
         assert result.subdomains_count == 10
         assert result.https_subdomains_count == 10
         assert payload_subdomains == []
+
+    @patch("web.logic.amass.AmassManager.enumerate_subdomains_for_domain")
+    @patch("web.logic.targets.TargetManager.test_domains_for_https")
+    def test_scan_parent_domain_many_results_all_https_mixed_codes(
+            self, test_domains_for_https, enumerate_subdomains_for_domain
+    ) -> None:
+        """Tests scan_parent_domain to ensure that it creates all of the expected database records when
+        many results are found from a subdomain scan, all respond to HTTPS, and some of those responses
+        do not have 200 status codes.
+        """
+        subdomains_200 = [f.domain_name() for _ in range(5)]
+        subdomains_400 = [f.domain_name() for _ in range(5)]
+        enumerate_subdomains_for_domain.return_value = subdomains_200 + subdomains_400
+        https_test = [(x, 200) for x in subdomains_200]
+        https_test.extend([(x, 400) for x in subdomains_400])
+        test_domains_for_https.return_value = https_test
+        domain = f.domain_name()
+        summary_count_1 = ScanSummary.objects.count()
+        domain_count_1 = ScanDomain.objects.count()
+        result = TargetManager.scan_parent_domain(parent_domain=domain)
+        summary_count_2 = ScanSummary.objects.count()
+        domain_count_2 = ScanDomain.objects.count()
+        payload_subdomains = (
+            TargetManager.get_all_internal_subdomains_for_parent_domain(
+                parent_domain=domain
+            )
+        )
+        assert summary_count_2 == summary_count_1 + 1
+        assert domain_count_2 == domain_count_1 + 10
+        assert result.subdomains_count == 10
+        assert result.https_subdomains_count == 5
+        assert sorted(payload_subdomains) == sorted(subdomains_400)

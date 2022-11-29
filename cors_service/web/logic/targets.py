@@ -219,7 +219,7 @@ class TargetManager:
         summary = ScanSummary(
             parent_domain=parent_domain,
             subdomains_count=len(subdomains),
-            https_subdomains_count=len(live_subdomains),
+            https_subdomains_count=len(live_subdomains_200s),
             time_started=time_started,
             time_completed=timezone.now(),
         )
