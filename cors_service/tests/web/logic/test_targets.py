@@ -364,11 +364,11 @@ class TestTargetManager:
         self, test_domains_for_https, enumerate_subdomains_for_domain
     ) -> None:
         """Tests scan_parent_domain to ensure that it creates all of the expected database records when
-        a single result is found from a subdomain scan that doesn't respond to HTTPS.
+        a single result is found from a subdomain scan that does respond to HTTPS.
         """
         subdomain = f.domain_name()
         enumerate_subdomains_for_domain.return_value = [subdomain]
-        test_domains_for_https.return_value = [subdomain]
+        test_domains_for_https.return_value = [(subdomain, 200)]
         domain = f.domain_name()
         summary_count_1 = ScanSummary.objects.count()
         domain_count_1 = ScanDomain.objects.count()
@@ -426,7 +426,7 @@ class TestTargetManager:
         https_subdomains = subdomains[:5]
         non_https_subdomains = subdomains[5:]
         enumerate_subdomains_for_domain.return_value = subdomains
-        test_domains_for_https.return_value = https_subdomains
+        test_domains_for_https.return_value = [(x, 200) for x in https_subdomains]
         domain = f.domain_name()
         summary_count_1 = ScanSummary.objects.count()
         domain_count_1 = ScanDomain.objects.count()
@@ -454,7 +454,7 @@ class TestTargetManager:
         """
         subdomains = [f.domain_name() for _ in range(10)]
         enumerate_subdomains_for_domain.return_value = subdomains
-        test_domains_for_https.return_value = subdomains
+        test_domains_for_https.return_value = [(x, 200) for x in subdomains]
         domain = f.domain_name()
         summary_count_1 = ScanSummary.objects.count()
         domain_count_1 = ScanDomain.objects.count()
