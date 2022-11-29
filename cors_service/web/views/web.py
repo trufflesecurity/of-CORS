@@ -164,6 +164,9 @@ class CORSRequestResultListView(FilteredSingleTableView):
     table_class = CORSRequestResultTable
     template_name = "web/generic_table.html"
     filterset_class = CORSRequestResultFilter
+    filter_defaults = {
+        "success": True,
+    }
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         to_return = super().get_context_data(**kwargs)
