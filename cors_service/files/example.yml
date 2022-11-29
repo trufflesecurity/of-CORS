@@ -1,0 +1,8 @@
+
+hosts:
+  testing:
+    host_domain: 127.0.0.1:8080
+    redirect_domain: google.com
+    targets:
+      - enable-cors.org
+      - example.com
