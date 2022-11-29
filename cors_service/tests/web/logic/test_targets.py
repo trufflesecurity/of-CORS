@@ -475,7 +475,7 @@ class TestTargetManager:
     @patch("web.logic.amass.AmassManager.enumerate_subdomains_for_domain")
     @patch("web.logic.targets.TargetManager.test_domains_for_https")
     def test_scan_parent_domain_many_results_all_https_mixed_codes(
-            self, test_domains_for_https, enumerate_subdomains_for_domain
+        self, test_domains_for_https, enumerate_subdomains_for_domain
     ) -> None:
         """Tests scan_parent_domain to ensure that it creates all of the expected database records when
         many results are found from a subdomain scan, all respond to HTTPS, and some of those responses

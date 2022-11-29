@@ -204,7 +204,9 @@ class TargetManager:
             f"Now testing to see which of those domains may be an internal-facing domain..."
         )
         live_subdomains = TargetManager.test_domains_for_https(domains=subdomains)
-        live_subdomains_200s = [x[0] for x in filter(lambda x: x[1] == 200, live_subdomains)]
+        live_subdomains_200s = [
+            x[0] for x in filter(lambda x: x[1] == 200, live_subdomains)
+        ]
         internal_domains = set(subdomains) - set(live_subdomains_200s)
         if len(internal_domains) == 0:
             logger.warning(
