@@ -31,3 +31,7 @@ run_server :
 package_to_zip :
 	rm -rf package.tar.gz
 	tar -czvf package.tar.gz corshunter tests vendor web Makefile manage.py Procfile requirements.txt release-tasks.sh
+
+deploy_to_heroku : package_to_zip
+	mv package.tar.gz terraform
+	cd terraform && terraform apply -var heroku_app_name=$(HEROKU_APP_NAME) -auto-approve -target=heroku_formation.cors_hunter

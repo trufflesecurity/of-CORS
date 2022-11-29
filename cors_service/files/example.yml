@@ -1,4 +1,9 @@
 
+terraform:
+  # You must change this to a unique string that is a valid Heroku app name
+  heroku_app_name: best-cors-hunter
+  cloudflare_api_token:
+
 hosts:
   testing:
     host_domain: 127.0.0.1:8080
