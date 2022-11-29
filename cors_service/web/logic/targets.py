@@ -23,18 +23,18 @@ logger = logging.getLogger(__name__)
 
 def _test_https_domain(
     domain: str, timeout_s: int = settings.HTTPS_TESTING_TIMEOUT
-) -> tuple[str, bool]:
+) -> tuple[str, bool, int]:
     logger.debug(f"Attempting to request HTTPS site for domain '{domain}'...")
     try:
-        requests.head(
+        response = requests.head(
             url=f"https://{domain}/",
             timeout=timeout_s,
         )
     except requests.exceptions.ConnectionError:
         logger.debug(f"Failed to open an HTTPS connection to domain '{domain}'.")
-        return domain, False
+        return domain, False, -1
     logger.debug(f"Successfully opened an HTTPS connection to domain '{domain}'.")
-    return domain, True
+    return domain, True, response.status_code
 
 
 class TargetManagerException(Exception):
@@ -179,7 +179,7 @@ class TargetManager:
     def test_domains_for_https(
         domains: list[str],
         pool_size: int = settings.HTTPS_TESTING_POOL_SIZE,
-    ) -> list[str]:
+    ) -> list[tuple[str, int]]:
         """Test the given list of domains for whether an HTTPS service is listening on it. Return the
         list of domains that responded to HTTPS requests.
         """
@@ -187,7 +187,7 @@ class TargetManager:
             return []
         with concurrent.futures.ThreadPoolExecutor(max_workers=pool_size) as executor:
             results = executor.map(_test_https_domain, domains)
-        return [x for x, y in results if y]
+        return [(x, z) for x, y, z in results if y]
 
     @staticmethod
     def scan_parent_domain(parent_domain: str) -> ScanSummary:
@@ -204,7 +204,10 @@ class TargetManager:
             f"Now testing to see which of those domains may be an internal-facing domain..."
         )
         live_subdomains = TargetManager.test_domains_for_https(domains=subdomains)
-        internal_domains = set(subdomains) - set(live_subdomains)
+        live_subdomains_200s = [
+            x[0] for x in filter(lambda x: x[1] == 200, live_subdomains)
+        ]
+        internal_domains = set(subdomains) - set(live_subdomains_200s)
         if len(internal_domains) == 0:
             logger.warning(
                 f"None of the {len(subdomains)} subdomains appear to be internal only domains :( "
@@ -218,7 +221,7 @@ class TargetManager:
         summary = ScanSummary(
             parent_domain=parent_domain,
             subdomains_count=len(subdomains),
-            https_subdomains_count=len(live_subdomains),
+            https_subdomains_count=len(live_subdomains_200s),
             time_started=time_started,
             time_completed=timezone.now(),
         )
@@ -227,7 +230,7 @@ class TargetManager:
             scan_domain = ScanDomain(
                 summary=summary,
                 domain=subdomain,
-                has_https=subdomain in live_subdomains,
+                has_https=subdomain in live_subdomains_200s,
             )
             scan_domain.save()
         logger.debug(f"Results for scan saved under ScanSummary with ID {summary.id}.")
