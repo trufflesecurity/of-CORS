@@ -20,8 +20,7 @@ class FilteredSingleTableView(SingleTableMixin, FilterView):
     filter_defaults: dict[str, Any]
 
     def get_filterset_kwargs(self, filterset_class: Type[FilterSet]) -> dict[str, Any]:
-        """Custom implementation of get_filterset_kwargs to include defaults and sorting
-        configuration.
+        """Custom implementation of get_filterset_kwargs to include defaults configuration.
 
         https://stackoverflow.com/questions/48507955/django-filterset-set-initial-value
         """
