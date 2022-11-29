@@ -1,5 +1,6 @@
-from typing import Optional, Type
+from typing import Any, Optional, Type
 
+from django.http import QueryDict
 from django.urls import reverse
 from django.utils.html import format_html
 from django_filters import FilterSet
@@ -15,6 +16,24 @@ class FilteredSingleTableView(SingleTableMixin, FilterView):
 
     https://gist.github.com/ckrybus/1c597830ed6d0dead642fd4cb31f3b7e
     """
+
+    filter_defaults: dict[str, Any]
+
+    def get_filterset_kwargs(self, filterset_class: Type[FilterSet]) -> dict[str, Any]:
+        """Custom implementation of get_filterset_kwargs to include defaults configuration.
+
+        https://stackoverflow.com/questions/48507955/django-filterset-set-initial-value
+        """
+        kwargs = super().get_filterset_kwargs(filterset_class)
+        if kwargs["data"] is None:
+            filter_values = QueryDict(mutable=True)
+        else:
+            filter_values = kwargs["data"].copy()
+        for k, v in self.filter_defaults.items():
+            if k not in filter_values:
+                filter_values[k] = v
+        kwargs["data"] = filter_values
+        return kwargs
 
     def get_filterset(self, filterset_class: Type[FilterSet]) -> FilterSet:
         kwargs = self.get_filterset_kwargs(filterset_class)

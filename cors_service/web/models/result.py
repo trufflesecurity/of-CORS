@@ -75,3 +75,6 @@ class CORSRequestResult(BaseModel):
         if not self.content:
             return None
         return b64decode(self.content.encode("utf-8")).decode("utf-8")
+
+    class Meta:
+        ordering = ["user_ip", "time_created"]
