@@ -442,7 +442,7 @@ class TestTargetManager:
         assert domain_count_2 == domain_count_1 + 10
         assert result.subdomains_count == 10
         assert result.https_subdomains_count == 5
-        assert payload_subdomains == non_https_subdomains
+        assert sorted(payload_subdomains) == sorted(non_https_subdomains)
 
     @patch("web.logic.amass.AmassManager.enumerate_subdomains_for_domain")
     @patch("web.logic.targets.TargetManager.test_domains_for_https")
