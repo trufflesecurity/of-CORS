@@ -26,26 +26,26 @@ class YmlManager:
             host_domain = v.get("host_domain")
             redirect_domain = v.get("redirect_domain")
             targets = v.get("targets", [])
-            logger.debug(
+            logger.info(
                 f"Host domain of '{host_domain}' will redirect to '{redirect_domain}' "
                 f"and launch a payload for the following domains:"
             )
             for target in targets:
-                logger.debug(f"-- {target}")
+                logger.info(f"-- {target}")
         all_targets = list(set(all_targets))
         for cur_target in all_targets:
-            logger.debug(f"Checking if we have target data for '{cur_target}' first...")
+            logger.info(f"Checking if we have target data for '{cur_target}' first...")
             try:
                 TargetDomain.objects.get(domain=cur_target)
-                logger.debug(
+                logger.info(
                     f"Target domain for '{cur_target}' found! No need to enumerate again."
                 )
             except TargetDomain.DoesNotExist:
-                logger.debug(
+                logger.info(
                     f"Target domain for '{cur_target}' not found. Enumerating now."
                 )
                 TargetManager.add_target_for_parent_domain(parent_domain=cur_target)
-        logger.debug(
+        logger.info(
             "All target domains populated successfully! Now setting up host to target mappings..."
         )
         HostToTargetMapping.objects.update(active=False)
@@ -56,7 +56,7 @@ class YmlManager:
                 redirect_domain=v["redirect_domain"],
                 target_domains=v["targets"],
             )
-            logger.debug(f"Host '{host_domain}' configured.")
+            logger.info(f"Host '{host_domain}' configured.")
 
     @staticmethod
     def configure_from_yml_file(path: str) -> None:

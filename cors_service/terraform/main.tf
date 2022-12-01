@@ -1,5 +1,9 @@
 terraform {
   required_providers {
+    cloudflare = {
+      source  = "cloudflare/cloudflare"
+      version = "~> 3.0"
+    }
     heroku = {
       source  = "heroku/heroku"
       version = "~> 5.0"
@@ -7,40 +11,20 @@ terraform {
   }
 }
 
-variable "heroku_app_name" {
-  description = "Name to assign to the Heroku app"
+provider "cloudflare" {
+  api_token = var.cloudflare_api_token
 }
 
-resource "heroku_app" "cors_hunter" {
-  name = var.heroku_app_name
-  region = "us"
-
-  config_vars = {
-    "PROD" = "1"
-  }
+module "heroku" {
+  source = "./heroku"
+  heroku_app_name = var.heroku_app_name
+  host_domains = var.host_domains
 }
 
-resource "heroku_addon" "cors_hunter_db" {
-  app_id = heroku_app.cors_hunter.id
-  plan = "heroku-postgresql:mini"
-}
-
-resource "heroku_build" "cors_hunter" {
-  app_id = heroku_app.cors_hunter.id
-  buildpacks = ["https://github.com/heroku/heroku-buildpack-python"]
-  source {
-    path = "package.tar.gz"
-  }
-}
-
-resource "heroku_formation" "cors_hunter" {
-  app_id = heroku_app.cors_hunter.id
-  type = "web"
-  quantity = 1
-  size = "hobby"
-  depends_on = [heroku_build.cors_hunter]
-}
-
-output "cors_hunter_url" {
-  value = "https://${heroku_app.cors_hunter.name}.herokuapp.com"
+module "cloudflare" {
+  for_each = module.heroku.domain_map
+  source = "./cloudflare"
+  zone = each.key
+  root_cname_target = each.value[0]
+  wildcard_cname_target = each.value[1]
 }

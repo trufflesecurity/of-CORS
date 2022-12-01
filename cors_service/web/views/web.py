@@ -88,13 +88,16 @@ def landing(request: HttpRequest) -> HttpResponse:
     If the request is to a domain that we do not have configured as a host domain then we simply return
     a 404 not found.
     """
-    should_render, _ = _should_render_for_host(request=request)
+    should_render, host_domain = _should_render_for_host(request=request)
     if not should_render:
         raise Http404()
+    assert host_domain is not None
     return render(
         request=request,
         template_name="web/landing_sw.html",
-        context={},
+        context=_get_js_context_for_request(
+            request=request, host_domain=host_domain, include_payload_targets=True
+        ),
     )
 
 

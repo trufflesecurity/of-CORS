@@ -24,16 +24,16 @@ logger = logging.getLogger(__name__)
 def _test_https_domain(
     domain: str, timeout_s: int = settings.HTTPS_TESTING_TIMEOUT
 ) -> tuple[str, bool, int]:
-    logger.debug(f"Attempting to request HTTPS site for domain '{domain}'...")
+    logger.info(f"Attempting to request HTTPS site for domain '{domain}'...")
     try:
         response = requests.head(
             url=f"https://{domain}/",
             timeout=timeout_s,
         )
     except requests.exceptions.ConnectionError:
-        logger.debug(f"Failed to open an HTTPS connection to domain '{domain}'.")
+        logger.info(f"Failed to open an HTTPS connection to domain '{domain}'.")
         return domain, False, -1
-    logger.debug(f"Successfully opened an HTTPS connection to domain '{domain}'.")
+    logger.info(f"Successfully opened an HTTPS connection to domain '{domain}'.")
     return domain, True, response.status_code
 
 
@@ -193,13 +193,13 @@ class TargetManager:
     def scan_parent_domain(parent_domain: str) -> ScanSummary:
         """Attempt to find as many 'internal' subdomains as possible for the given parent domain."""
         time_started = timezone.now()
-        logger.debug(f"Starting scan for parent domain of '{parent_domain}'.")
-        logger.debug(
+        logger.info(f"Starting scan for parent domain of '{parent_domain}'.")
+        logger.info(
             f"First finding all the subdomains that we can for parent domain '{parent_domain}' "
             f"(this may take a while but rest assured it's working)..."
         )
         subdomains = AmassManager.enumerate_subdomains_for_domain(domain=parent_domain)
-        logger.debug(
+        logger.info(
             f"A total of {len(subdomains)} subdomains were found for parent domain '{parent_domain}'. "
             f"Now testing to see which of those domains may be an internal-facing domain..."
         )
@@ -214,10 +214,10 @@ class TargetManager:
                 f"Nothing to add to our targets list for parent domain of '{parent_domain}'."
             )
         else:
-            logger.debug(
+            logger.info(
                 f"A total of {len(internal_domains)} domains appear to be potential internal domains."
             )
-        logger.debug("Saving scan results...")
+        logger.info("Saving scan results...")
         summary = ScanSummary(
             parent_domain=parent_domain,
             subdomains_count=len(subdomains),
@@ -233,7 +233,7 @@ class TargetManager:
                 has_https=subdomain in live_subdomains_200s,
             )
             scan_domain.save()
-        logger.debug(f"Results for scan saved under ScanSummary with ID {summary.id}.")
+        logger.info(f"Results for scan saved under ScanSummary with ID {summary.id}.")
         return summary
 
     @staticmethod
@@ -241,20 +241,20 @@ class TargetManager:
         """Perform all of the necessary intelligence gathering and book-keeping to add the given parent
         domain as a target for CORS Hunter.
         """
-        logger.debug(f"Adding domain '{parent_domain}' as a target to CORS Hunter...")
+        logger.info(f"Adding domain '{parent_domain}' as a target to CORS Hunter...")
         TargetManager.scan_parent_domain(parent_domain=parent_domain)
-        logger.debug(
+        logger.info(
             f"Subdomain scanning for parent domain '{parent_domain}' completed. Adding results as target..."
         )
         subdomains = TargetManager.get_all_internal_subdomains_for_parent_domain(
             parent_domain=parent_domain
         )
-        logger.debug(
+        logger.info(
             f"A total of {len(subdomains)} subdomains were found under parent domain '{parent_domain}'."
         )
         TargetManager.set_targets_for_domain(
             parent_domain=parent_domain, subdomains=subdomains
         )
-        logger.debug(
+        logger.info(
             f"All {len(subdomains)} have been set as payload candidates for parent domain '{parent_domain}'."
         )

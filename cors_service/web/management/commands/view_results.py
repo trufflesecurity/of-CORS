@@ -1,9 +1,13 @@
+import argparse
 import logging
 import webbrowser
 from typing import Any, Optional
 
 from django.conf import settings
-from django.core.management import BaseCommand
+from django.core.management import (  # type: ignore[attr-defined]
+    BaseCommand,
+    CommandParser,
+)
 from django.urls import reverse
 
 from web.models.auth import AuthTicket
@@ -14,6 +18,9 @@ logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     """Django management command for opening up the results page in an authenticated session."""
+
+    def add_arguments(self, parser: CommandParser) -> None:
+        parser.add_argument("--url-only", action=argparse.BooleanOptionalAction)
 
     def handle(self, *args: Any, **options: Any) -> Optional[str]:
         host_domain = HostDomain.objects.first()
@@ -30,6 +37,9 @@ class Command(BaseCommand):
         )
         scheme = "http" if settings.DEBUG else "https"
         url = f"{scheme}://{host_domain.domain}{url_path}"
-        logger.info(f"Ticket generated. Opening browser window to URL '{url}'...")
-        webbrowser.open(url)
+        if not options["url_only"]:
+            logger.info(f"Ticket generated. Opening browser window to URL '{url}'...")
+            webbrowser.open(url)
+        else:
+            self.stdout.write(url, ending="")
         return None
