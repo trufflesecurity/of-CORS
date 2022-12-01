@@ -30,8 +30,27 @@ run_server :
 
 package_to_zip :
 	rm -rf package.tar.gz
+	rm -rf terraform/package.tar.gz
 	tar -czvf package.tar.gz corshunter tests vendor web Makefile manage.py Procfile requirements.txt release-tasks.sh
-
-deploy_to_heroku : package_to_zip
 	mv package.tar.gz terraform
-	cd terraform && terraform apply -var heroku_app_name=$(HEROKU_APP_NAME) -auto-approve -target=heroku_formation.cors_hunter
+
+deploy_infrastructure : package_to_zip
+	echo "Deploying infrastructure based on contents of '$(CONFIG_FILE)' configuration file..."
+	$(eval HEROKU_APP_NAME := $(shell python manage.py get_terraform_arg -f $(CONFIG_FILE) -a heroku_app_name_var))
+	$(eval CLOUDFLARE_API_TOKEN := $(shell python manage.py get_terraform_arg -f $(CONFIG_FILE) -a cloudflare_api_token))
+	$(eval HOST_DOMAINS := $(shell python manage.py get_terraform_arg -f $(CONFIG_FILE) -a host_domains))
+	cd terraform && terraform apply -var $(HEROKU_APP_NAME) -var $(CLOUDFLARE_API_TOKEN) -var $(HOST_DOMAINS) -auto-approve
+
+configure_heroku :
+	echo "Configuring Heroku deployment based on contents of '$(CONFIG_FILE)' configuration file..."
+	$(eval HEROKU_APP_NAME := $(shell python manage.py get_terraform_arg -f $(CONFIG_FILE) -a heroku_app_name))
+	$(eval YAML_CONTENT := $(shell cat $(CONFIG_FILE) | base64))
+	heroku run -a $(HEROKU_APP_NAME) "python manage.py configure_from_yaml -s $(YAML_CONTENT)"
+
+open_heroku_console :
+	echo "Opening a browser to the results viewing page for the remote deployment on Heroku (config file at '$(CONFIG_FILE)')..."
+	$(eval HEROKU_APP_NAME := $(shell python manage.py get_terraform_arg -f $(CONFIG_FILE) -a heroku_app_name))
+	$(eval TICKET_URL := $(shell heroku run -a $(HEROKU_APP_NAME) "python manage.py view_results --url-only"))
+	open $(TICKET_URL)
+
+deploy_and_configure : deploy_infrastructure configure_heroku

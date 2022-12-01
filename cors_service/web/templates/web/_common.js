@@ -1,6 +1,6 @@
 const redirectAway = () => {
     setTimeout(() => {
-        window.location.replace("{{ redirect_url }}");
+        window.location.replace(REDIRECT_URL);
     }, {{ redirect_ms }})
 }
 
