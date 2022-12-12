@@ -5,6 +5,7 @@ terraform:
   cloudflare_api_token: this-is-my-api-token
 
 hosts:
+  # This can be an arbitrary string, but must be unique as a direct descendant of hosts
   testing:
     host_domain: 127.0.0.1:8080
     redirect_domain: google.com

@@ -16,6 +16,7 @@ from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 from typing import Any
+from uuid import uuid4
 
 import dj_database_url
 
@@ -25,11 +26,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY", "e6bc26ad-5398-4388-bd0e-9c71cc6b80d0")
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("PROD", "0") == "0"
+
+# SECURITY WARNING: keep the secret key used in production secret!
+if DEBUG:
+    SECRET_KEY = os.getenv("SECRET_KEY", "e6bc26ad-5398-4388-bd0e-9c71cc6b80d0")
+else:
+    SECRET_KEY = os.getenv("SECRET_KEY", str(uuid4()))
 
 ALLOWED_HOSTS: list[str] = ["*"]
 

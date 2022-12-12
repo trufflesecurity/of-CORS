@@ -30,7 +30,7 @@ def _test_https_domain(
             url=f"https://{domain}/",
             timeout=timeout_s,
         )
-    except requests.exceptions.ConnectionError:
+    except requests.exceptions.RequestException:
         logger.info(f"Failed to open an HTTPS connection to domain '{domain}'.")
         return domain, False, -1
     logger.info(f"Successfully opened an HTTPS connection to domain '{domain}'.")
