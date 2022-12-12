@@ -1,0 +1,14 @@
+terraform:
+  # You must change this to a unique string that is a valid Heroku app name
+  heroku_app_name: best-of-cors
+  # Fill this out with your Cloudflare API token
+  cloudflare_api_token: this-is-my-api-token
+
+hosts:
+  # This can be an arbitrary string, but must be unique as a direct descendant of hosts
+  testing:
+    host_domain: 127.0.0.1:8080
+    redirect_domain: google.com
+    targets:
+      - enable-cors.org
+      - example.com
