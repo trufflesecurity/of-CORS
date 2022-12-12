@@ -1,20 +1,14 @@
-# Creative Name Goes here
+
+## Running Things
+
+1. [Install Terraform](https://developer.hashicorp.com/terraform/downloads)
+2. [Obtain a Heroku API token](https://devcenter.heroku.com/articles/using-terraform-with-heroku#obtaining-an-authorization-token)
 
 
-## Steps
-
-### Step 1:
-Setup nginx with the config file provided 
-
-### Step 2: Wildcard DNS to the server
-Can be done in namecheap
-
-### Step 3: Get a valid SSL cert
 ```bash
-sudo certbot certonly --preferred-challenges dns -d berinternal.com -d '*.berinternal.com'
+heroku login
+heroku authorizations:create --description terraform-cors-hunter
+# Need to create a variable to use with Terraform
+# Email can come from heroku whoami
+export HEROKU_API_KEY=ff5fdf7d-d36e-4c20-a9ce-a6f53f5e240a HEROKU_EMAIL=cegrayson3@gmail.com
 ```
-### Step 4: Run the webserver
-```bash
-python main.py
-```
-Add additional service worker routes and service worker files for more domains
