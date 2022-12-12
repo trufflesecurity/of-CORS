@@ -12,7 +12,7 @@ SAMPLE_CONFIG_FILE: Final[
 ] = """
 terraform:
   # You must change this to a unique string that is a valid Heroku app name
-  heroku_app_name: best-cors-hunter
+  heroku_app_name: best-of-cors
   # Fill this out with your Cloudflare API token
   cloudflare_api_token: this-is-my-api-token
 
@@ -67,12 +67,12 @@ class TestCommand:
         """Tests that get_terraform_arg behaves as expected when asked to retrieve the Heroku app name variable
         arg."""
         result = self._call_command("-f", temp_config_file, "-a", "heroku_app_name_var")
-        assert result == "heroku_app_name=best-cors-hunter"
+        assert result == "heroku_app_name=best-of-cors"
 
     def test_heroku_app_name(self, temp_config_file) -> None:
         """Tests that get_terraform_arg behaves as expected when asked to retrieve the Heroku app name arg."""
         result = self._call_command("-f", temp_config_file, "-a", "heroku_app_name")
-        assert result == "best-cors-hunter"
+        assert result == "best-of-cors"
 
     def test_host_domains(self, temp_config_file) -> None:
         """Tests that get_terraform_arg behaves as expected when asked to retrieve the host domains variable arg."""

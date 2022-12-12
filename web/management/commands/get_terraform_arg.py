@@ -18,7 +18,7 @@ class Command(BaseCommand):
             "--file",
             metavar="<YAML_FILE>",
             type=str,
-            help="The local file path to the YAML file that contains the expected configuration for CORS hunter.",
+            help="The local file path to the YAML file that contains the expected configuration for of-CORS.",
             required=True,
         )
         parser.add_argument(

@@ -239,9 +239,9 @@ class TargetManager:
     @staticmethod
     def add_target_for_parent_domain(parent_domain: str) -> None:
         """Perform all of the necessary intelligence gathering and book-keeping to add the given parent
-        domain as a target for CORS Hunter.
+        domain as a target for of-CORS.
         """
-        logger.info(f"Adding domain '{parent_domain}' as a target to CORS Hunter...")
+        logger.info(f"Adding domain '{parent_domain}' as a target to of-CORS...")
         TargetManager.scan_parent_domain(parent_domain=parent_domain)
         logger.info(
             f"Subdomain scanning for parent domain '{parent_domain}' completed. Adding results as target..."

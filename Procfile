@@ -1,2 +1,2 @@
-web: gunicorn corshunter.wsgi
+web: gunicorn ofcors.wsgi
 release: bash ./release-tasks.sh

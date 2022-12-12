@@ -20,7 +20,7 @@ LOCAL_DOMAINS = [
     "127.0.0.1:8080",
 ]
 REDIRECT_DOMAIN = "www.google.com"
-CORS_PARENT_DOMAIN = "testing.corshunter.local"
+CORS_PARENT_DOMAIN = "testing.ofcors.local"
 CORS_TARGET_SUBDOMAINS = [
     "enable-cors.org",
     "www.google.com",

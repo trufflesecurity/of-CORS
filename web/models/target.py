@@ -4,7 +4,7 @@ from web.models.base import BaseModel
 
 
 class TargetDomain(BaseModel):
-    """Database model for representing a single domain that is being targeted using CORS Hunter."""
+    """Database model for representing a single domain that is being targeted using of-CORS."""
 
     domain = models.TextField(
         null=False,
@@ -79,7 +79,7 @@ class HostToTargetMapping(BaseModel):
 
 
 class TargetSubdomain(BaseModel):
-    """Database model for representing a single subdomain that is being targeted using CORS Hunter."""
+    """Database model for representing a single subdomain that is being targeted using of-CORS."""
 
     target_domain = models.ForeignKey(
         TargetDomain,

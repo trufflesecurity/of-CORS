@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
-    """Django management command for adding a new domain mapping as a target for CORS Hunter payloads."""
+    """Django management command for adding a new domain mapping as a target for of-CORS payloads."""
 
     def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument(
@@ -28,7 +28,7 @@ class Command(BaseCommand):
             "--redirect_domain",
             metavar="<REDIRECT_DOMAIN>",
             type=str,
-            help="The domain that CORS Hunter will redirect to after launching the payload.",
+            help="The domain that of-CORS will redirect to after launching the payload.",
             required=True,
         )
         parser.add_argument(
@@ -46,7 +46,7 @@ class Command(BaseCommand):
         redirect_domain = options["redirect_domain"]
         targets = [x.strip() for x in options["targets"].split(",")]
         logger.info(
-            f"Now adding the host domain of '{host_domain}' to CORS Hunter configuration."
+            f"Now adding the host domain of '{host_domain}' to of-CORS configuration."
         )
         logger.info(
             f"First we will need to enumerate subdomains for the {len(targets)} targets you supplied..."

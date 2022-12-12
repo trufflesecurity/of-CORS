@@ -45,7 +45,7 @@ class Command(BaseCommand):
             YmlManager.configure_from_yml_file(path=file_path)
         elif options["string"]:
             logger.info(
-                "Configuring CORS Hunter based on contents of base64-encoded YAML file..."
+                "Configuring of-CORS based on contents of base64-encoded YAML file..."
             )
             contents = b64decode(options["string"].encode("utf-8")).decode("utf-8")
             YmlManager.configure_from_yml_string(yml=contents)

@@ -5,13 +5,13 @@ lint_ci :
 	black . --exclude "(migrations|venv)" --check
 	isort . --check-only
 	flake8 --ignore=E203,E128,E231,E302,E402,E501,W503,W605,E722 --exclude=venv
-	mypy corshunter web --pretty
+	mypy ofcors web --pretty
 
 lint :
 	black . --exclude "(migrations|venv)"
 	isort .
 	flake8 --ignore=E203,E128,E231,E302,E402,E501,W503,W605,E722 --exclude=venv
-	mypy corshunter web --pretty
+	mypy ofcors web --pretty
 
 test :
 	pytest --cov=web --cov-report html tests/
@@ -31,7 +31,7 @@ run_server :
 package_to_zip :
 	rm -rf package.tar.gz
 	rm -rf terraform/package.tar.gz
-	tar -czvf package.tar.gz corshunter tests vendor web Makefile manage.py Procfile requirements.txt release-tasks.sh
+	tar -czvf package.tar.gz ofcors tests vendor web Makefile manage.py Procfile requirements.txt release-tasks.sh
 	mv package.tar.gz terraform
 
 deploy_infrastructure : package_to_zip
