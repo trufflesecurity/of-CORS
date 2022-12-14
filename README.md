@@ -1,6 +1,10 @@
 # of-CORS
 
-`of-CORS` is [Truffle Security's](https://trufflesecurity.com/) tool suite for identifying and exploiting CORS misconfigurations on the internal networks of bug bounty targets.
+`of-CORS` is [Truffle Security's](https://trufflesecurity.com/) tool suite for identifying and exploiting CORS misconfigurations on the internal networks of bug bounty targets using typosquatting.
+
+<images>
+
+You can read more here []
 
 ## How Does it Work??
 
@@ -10,7 +14,7 @@ Once a service worker has been registered in a victim's browser, a JavaScript pa
 
 The collected results can subsequently be viewed in a minimalist dashboard available on the `of-CORS` application.
 
-## Getting of-CORS Up and Running
+## Getting started
 
 The following steps can be taken to set up `of-CORS` in your own deployment.
 
@@ -18,9 +22,19 @@ Due to the complexity of getting `of-CORS` set up (namely complications around S
 
 ### Purchase Relevant Domains
 
-`of-CORS` isn't very useful if nobody visits it once it's set up. In order to get victims to visit the application you will need to register domains that will point to it. In [our blog post](TODO) we made use of [typo-squat](https://www.kaspersky.com/resource-center/definitions/what-is-typosquatting) domains so that our discoveries would be eligible for bug bounty submissions (as social engineering typically disqualifies efforts from bug bounty programs).
+Start by purchasing a domain an internal employee at the target company is likely to land on. We recommend buying a [typo-squat](https://www.kaspersky.com/resource-center/definitions/what-is-typosquatting) domain of an internal domain. We've found copypaste errors are a good place to start.
 
-Whether you go the route of using typo-squat domains or other social engineering approaches, you'll need to acquire some domains for `of-CORS` to work. 
+So for example if the company you're testing CORS uses uberinternal.com for internal domains, you may want to purchase berinternal.com to start getting browser traffic from internal employees.
+
+<img width="877" alt="image" src="https://user-images.githubusercontent.com/3084554/207484010-68a47ac3-504d-44c0-ad3c-e1622600fb81.png">
+
+
+### Setting up Cloudflare DNS
+
+Create a free cloudflare account, click "new website" in the upper left, and configure your new website to use the cloudflare nameservers:
+
+<img width="745" alt="image" src="https://user-images.githubusercontent.com/3084554/207482973-529b991a-e7a5-414d-a6b8-14711e01f289.png">
+
 
 ### Get a Cloudflare API Key
 
