@@ -44,7 +44,7 @@ deploy_infrastructure : package_to_zip
 configure_heroku :
 	echo "Configuring Heroku deployment based on contents of '$(CONFIG_FILE)' configuration file..."
 	$(eval HEROKU_APP_NAME := $(shell python manage.py get_terraform_arg -f $(CONFIG_FILE) -a heroku_app_name))
-	$(eval YAML_CONTENT := $(shell cat $(CONFIG_FILE) | base64))
+	$(eval YAML_CONTENT := $(shell cat $(CONFIG_FILE) | base64 | tr -d '\r\n'))
 	heroku run -a $(HEROKU_APP_NAME) "python manage.py configure_from_yaml -s $(YAML_CONTENT)"
 
 open_heroku_console :
