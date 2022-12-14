@@ -2,9 +2,11 @@
 
 `of-CORS` is [Truffle Security's](https://trufflesecurity.com/) tool suite for identifying and exploiting CORS misconfigurations on the internal networks of bug bounty targets using typosquatting.
 
-<images>
+<img width="623" alt="image" src="https://user-images.githubusercontent.com/3084554/207484199-c4fc1bec-0c21-4668-a169-b14da8fe0e1f.png">
+<img width="523" alt="image" src="https://user-images.githubusercontent.com/3084554/207484332-7ad461c0-365f-4b2d-8a47-762bf06d7f85.png">
 
-You can read more here []
+
+You can read more here [https://trufflesecurity.com/blog/of-CORS](https://trufflesecurity.com/blog/of-CORS)
 
 ## How Does it Work??
 
