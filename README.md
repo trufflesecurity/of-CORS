@@ -31,9 +31,6 @@ So for example if the company you're testing CORS uses uberinternal.com for inte
 <img width="877" alt="image" src="https://user-images.githubusercontent.com/3084554/207484010-68a47ac3-504d-44c0-ad3c-e1622600fb81.png">
 
 
-
-
-
 ### Get a Cloudflare API Key
 
 `of-CORS` uses Cloudflare for receiving and routing wildcard DNS requests as well as terminating SSL/TLS connections.
@@ -46,23 +43,13 @@ The API key will need to have sufficient privileges to add, delete, and configur
 
 Once you've created an API token with the correct permissions you can proceed to the next step.
 
+*Important* make sure your cloudflare account is totally empty, and you don't register anything for the domain you purchased in the previous step
+
 ### Get a Heroku API Key
 
 `of-CORS` uses Heroku for easy application deployment and hosting.
 
-You'll need an active Heroku account to get the `of-CORS` application stack up and running. Once you have an account you'll want to install the Heroku command line interface (CLI) tool. With the CLI installed you can use it to start an authenticated CLI session with the following command:
-
-```bash
-heroku login
-```
-
-You can then confirm that your CLI is successfully authenticated by running the following command:
-
-```bash
-heroku whoami
-```
-
-Further documentation on authorizing the Heroku CLI for use with Terraform [can be found here](https://devcenter.heroku.com/articles/using-terraform-with-heroku#authorization).
+You'll need an active Heroku account to get the `of-CORS` application stack up and running. Once you have an account you'll want to add a credit card to your account (it will cost a few bucks a month all said and done)
 
 ### Configuring of-CORS for Deployment
 
@@ -123,34 +110,20 @@ hosts:
 
 Now if a victim accidentally visits `yinternalcorp1.com` or `yinternalcorp2.com` the payloads for enumerating CORS misconfigurations on `myinternalcorp1.com` and `myinternalcorp2.com` would be launched and the victim's browser would subsequently be redirected to the correct domain.
 
-### Installing Terraform
-
-Deploying `of-CORS` relies on [Terraform](https://www.terraform.io/). You can follow the instructions for installing [Terraform here](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli). Once installed the `terraform` binary is expected to be available on your system's `PATH`.
-
-### Installing Python3
-
-Deploying `of-CORS` also relies on [Python3](https://www.python.org/downloads/). Make sure that it is installed and available on your system's `PATH`.
-
 ### Deploying of-CORS
 
-With authentication to our cloud providers taken care of and the `of-CORS` configuration file ready to go we can now move on to deployment.
-
-Firstly we'll need to initialize Terraform. This command should be run from the source code root directory:
+Run the following docker command, mounting the config file you just made into the container
 
 ```bash
-cd terraform && terraform init && cd ../
+docker run -v $PWD/config.yml:/config.yml -it --rm trufflesecurity/of-cors
 ```
 
-Let's say that our configuration file resides at `/tmp/of_cors_config.yml`. We would then run the following commands to get all of the `of-CORS` infrastructure up and running (note that this assumes that commands are being run in `bash`). Running this command can take 5-10 minutes so please be patient!
+This will prompt you to log into Heroku. You'll want to do so.
 
-```bash
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-CONFIG_FILE=/tmp/of_cors_config.yml make deploy_and_configure
-```
+After logging into Heroku, this command can take 5-10 minutes so please be patient! It's enumerating subdomains with amass for your target domain.
 
-**PLEASE NOTE** - There is a race condition that can occur when the Heroku infrastructure is spun up and and a console is immediately accessed within it. If running this last `make deploy_and_configure` command fails please wait for a few minutes and try running it again.
+
+**PLEASE NOTE** - There is a race condition that can occur when the Heroku infrastructure is spun up and and a console is immediately accessed within it. If you get an error please wait for a few minutes and try running `CONFIG_FILE=/config.yml make deploy_and_configure`.
 
 After the `deploy_and_configure` command finishes running you will now have...
 
@@ -161,6 +134,25 @@ After the `deploy_and_configure` command finishes running you will now have...
 ### Delegating DNS Authority
 
 The last thing we need to do for the `of-CORS` deployment to be ready to receive traffic is to configure the domain names you purchased to use Cloudflare as their authoritative DNS servers. Cloudflare has an in-depth guide to [doing this here](https://developers.cloudflare.com/dns/zone-setups/full-setup/setup/).
+
+
+## Viewing Results
+
+The following command can be used to view and query all the results in an authenticated browser session:
+
+```bash
+CONFIG_FILE=/config.yml make open_heroku_console
+```
+
+## Adding and Removing Targets
+
+The `of-CORS` configuration file is intended to support flexible addition and removal of domains that attacks are launched for. Simply update the contents of the `hosts` section in your configuration file and re-run the provisioning script:
+
+```bash
+source venv/bin/activate
+CONFIG_FILE=/tmp/of_cors_config.yml make deploy_and_configure
+```
+
 
 ### Confirming Everything is Set Up Correctly
 
@@ -205,20 +197,3 @@ Now navigate back to the dashboard page and change the `Success` filter to filte
 ![Full Dashboard](files/full_dash.png)
 
 Your trap is set! Now just sit back and relax and wait for your victims to stumble upon your tasty little domain.
-
-## Viewing Results
-
-The following command can be used to view and query all the results in an authenticated browser session:
-
-```bash
-CONFIG_FILE=<path_to_config_file> make open_heroku_console
-```
-
-## Adding and Removing Targets
-
-The `of-CORS` configuration file is intended to support flexible addition and removal of domains that attacks are launched for. Simply update the contents of the `hosts` section in your configuration file and re-run the provisioning script:
-
-```bash
-source venv/bin/activate
-CONFIG_FILE=/tmp/of_cors_config.yml make deploy_and_configure
-```
