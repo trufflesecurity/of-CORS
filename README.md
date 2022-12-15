@@ -31,11 +31,7 @@ So for example if the company you're testing CORS uses uberinternal.com for inte
 <img width="877" alt="image" src="https://user-images.githubusercontent.com/3084554/207484010-68a47ac3-504d-44c0-ad3c-e1622600fb81.png">
 
 
-### Setting up Cloudflare DNS
 
-Create a free cloudflare account, click "new website" in the upper left, and configure your new website to use the cloudflare nameservers:
-
-<img width="745" alt="image" src="https://user-images.githubusercontent.com/3084554/207482973-529b991a-e7a5-414d-a6b8-14711e01f289.png">
 
 
 ### Get a Cloudflare API Key
