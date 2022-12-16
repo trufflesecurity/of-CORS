@@ -51,6 +51,7 @@ configure_heroku :
 	$(eval HEROKU_APP_NAME := $(shell python manage.py get_terraform_arg -f $(CONFIG_FILE) -a heroku_app_name))
 	$(eval YAML_CONTENT := $(shell cat $(CONFIG_FILE) | base64 | tr -d '\r\n'))
 	heroku run -a $(HEROKU_APP_NAME) "python manage.py configure_from_yaml -s $(YAML_CONTENT)"
+	heroku config:set SECRET_KEY=`uuidgen` -a $(HEROKU_APP_NAME)
 
 open_heroku_console :
 	echo "Opening a browser to the results viewing page for the remote deployment on Heroku (config file at '$(CONFIG_FILE)')..."
@@ -65,3 +66,6 @@ print_heroku_console_url :
 	echo $(TICKET_URL)
 
 deploy_and_configure : deploy_infrastructure wait_for_heroku_console configure_heroku print_heroku_console_url
+
+build_docker_image : package_to_zip
+	docker build -t of-cors .
