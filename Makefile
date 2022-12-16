@@ -43,6 +43,7 @@ deploy_infrastructure : package_to_zip
 
 wait_for_heroku_console :
 	echo "-== HACKING THE MAINFRAME ==-"
+	echo "(...takes about 60 seconds)"
 	sleep 60
 	echo "--== MAINFRAME HACKED! ==-"
 
