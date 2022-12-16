@@ -31,7 +31,7 @@ run_server :
 package_to_zip :
 	rm -rf package.tar.gz
 	rm -rf terraform/package.tar.gz
-	tar -czvf package.tar.gz ofcors tests vendor web Makefile manage.py Procfile requirements.txt release-tasks.sh
+	tar -czvf package.tar.gz ofcors tests vendor web Makefile manage.py Procfile requirements.txt files terraform
 	mv package.tar.gz terraform
 
 deploy_infrastructure : package_to_zip
@@ -40,6 +40,11 @@ deploy_infrastructure : package_to_zip
 	$(eval CLOUDFLARE_API_TOKEN := $(shell python manage.py get_terraform_arg -f $(CONFIG_FILE) -a cloudflare_api_token))
 	$(eval HOST_DOMAINS := $(shell python manage.py get_terraform_arg -f $(CONFIG_FILE) -a host_domains))
 	cd terraform && terraform apply -var $(HEROKU_APP_NAME) -var $(CLOUDFLARE_API_TOKEN) -var $(HOST_DOMAINS) -auto-approve
+
+wait_for_heroku_console :
+	echo "-== HACKING THE MAINFRAME ==-"
+	sleep 60
+	echo "--== MAINFRAME HACKED! ==-"
 
 configure_heroku :
 	echo "Configuring Heroku deployment based on contents of '$(CONFIG_FILE)' configuration file..."
@@ -53,4 +58,10 @@ open_heroku_console :
 	$(eval TICKET_URL := $(shell heroku run -a $(HEROKU_APP_NAME) "python manage.py view_results --url-only"))
 	open $(TICKET_URL)
 
-deploy_and_configure : deploy_infrastructure configure_heroku
+print_heroku_console_url :
+	echo "Open the link below to view of-CORS results (config file at '$(CONFIG_FILE)')..."
+	$(eval HEROKU_APP_NAME := $(shell python manage.py get_terraform_arg -f $(CONFIG_FILE) -a heroku_app_name))
+	$(eval TICKET_URL := $(shell heroku run -a $(HEROKU_APP_NAME) "python manage.py view_results --url-only"))
+	echo $(TICKET_URL)
+
+deploy_and_configure : deploy_infrastructure wait_for_heroku_console configure_heroku print_heroku_console_url

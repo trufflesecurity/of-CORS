@@ -2,11 +2,10 @@
 
 `of-CORS` is [Truffle Security's](https://trufflesecurity.com/) tool suite for identifying and exploiting CORS misconfigurations on the internal networks of bug bounty targets using typosquatting.
 
-<img width="623" alt="image" src="https://user-images.githubusercontent.com/3084554/207484199-c4fc1bec-0c21-4668-a169-b14da8fe0e1f.png">
-<img width="523" alt="image" src="https://user-images.githubusercontent.com/3084554/207484332-7ad461c0-365f-4b2d-8a47-762bf06d7f85.png">
+![No Social Engineering](files/no_social_eng.png)
+![Come On In](files/come_on_in.png)
 
-
-You can read more here [https://trufflesecurity.com/blog/of-CORS](https://trufflesecurity.com/blog/of-CORS)
+You can [read more on the Truffle Security blog here](https://trufflesecurity.com/blog/of-CORS).
 
 ## How Does it Work??
 
@@ -22,14 +21,15 @@ The following steps can be taken to set up `of-CORS` in your own deployment.
 
 Due to the complexity of getting `of-CORS` set up (namely complications around SSL/TLS, DNS, and allowing wildcard requests to both) we make use of two cloud providers (Heroku and Cloudflare) in the application stack and Terraform to automate their configuration.
 
+**IMPORTANT** - `of-CORS` expects to set up _everything_ in both Cloudflare and Heroku related to the application deployment. This means that you should not manually add anything related to `of-CORS` to either Cloudflare or Heroku unless explicitly instructed to below.
+
 ### Purchase Relevant Domains
 
-Start by purchasing a domain an internal employee at the target company is likely to land on. We recommend buying a [typo-squat](https://www.kaspersky.com/resource-center/definitions/what-is-typosquatting) domain of an internal domain. We've found copypaste errors are a good place to start.
+Start by purchasing a domain an internal employee at the target company is likely to land on. We recommend buying a [typo-squat](https://www.kaspersky.com/resource-center/definitions/what-is-typosquatting) domain of an internal domain. We've found copy+paste errors are a good place to start.
 
-So for example if the company you're testing CORS uses uberinternal.com for internal domains, you may want to purchase berinternal.com to start getting browser traffic from internal employees.
+For example if the company you're testing CORS uses `uberinternal.com` for internal domains, you may want to purchase `berinternal.com` to start getting browser traffic from internal employees.
 
-<img width="877" alt="image" src="https://user-images.githubusercontent.com/3084554/207484010-68a47ac3-504d-44c0-ad3c-e1622600fb81.png">
-
+![burinternal.com](files/burinternal.png)
 
 ### Get a Cloudflare API Key
 
@@ -43,13 +43,11 @@ The API key will need to have sufficient privileges to add, delete, and configur
 
 Once you've created an API token with the correct permissions you can proceed to the next step.
 
-*Important* make sure your cloudflare account is totally empty, and you don't register anything for the domain you purchased in the previous step
-
 ### Get a Heroku API Key
 
 `of-CORS` uses Heroku for easy application deployment and hosting.
 
-You'll need an active Heroku account to get the `of-CORS` application stack up and running. Once you have an account you'll want to add a credit card to your account (it will cost a few bucks a month all said and done)
+You'll need an active Heroku account to get the `of-CORS` application stack up and running. Once you have an account you'll want to add a credit card to your account (it will cost a few bucks a month once everything is said and done).
 
 ### Configuring of-CORS for Deployment
 
@@ -112,7 +110,9 @@ Now if a victim accidentally visits `yinternalcorp1.com` or `yinternalcorp2.com`
 
 ### Deploying of-CORS
 
-Run the following docker command, mounting the config file you just made into the container
+`of-CORS` deployment relies on [Docker](https://www.docker.com/), so you'll need to [install it](https://docs.docker.com/get-docker/) and ensure that the `docker` binary is available on your system path.
+
+Run the following docker command, mounting the config file you made in the step above into the container:
 
 ```bash
 docker run -v $PWD/config.yml:/config.yml -it --rm trufflesecurity/of-cors
@@ -120,10 +120,9 @@ docker run -v $PWD/config.yml:/config.yml -it --rm trufflesecurity/of-cors
 
 This will prompt you to log into Heroku. You'll want to do so.
 
-After logging into Heroku, this command can take 5-10 minutes so please be patient! It's enumerating subdomains with amass for your target domain.
+After logging into Heroku, this command can take 5-10 minutes so please be patient! It's enumerating subdomains with `amass` for your target domain(s).
 
-
-**PLEASE NOTE** - There is a race condition that can occur when the Heroku infrastructure is spun up and and a console is immediately accessed within it. If you get an error please wait for a few minutes and try running `CONFIG_FILE=/config.yml make deploy_and_configure`.
+**PLEASE NOTE** - There is a race condition that can occur when the Heroku infrastructure is spun up and a console is immediately accessed within it. If you get an error please wait for a few minutes and try running `CONFIG_FILE=/config.yml make deploy_and_configure` again.
 
 After the `deploy_and_configure` command finishes running you will now have...
 
@@ -134,25 +133,6 @@ After the `deploy_and_configure` command finishes running you will now have...
 ### Delegating DNS Authority
 
 The last thing we need to do for the `of-CORS` deployment to be ready to receive traffic is to configure the domain names you purchased to use Cloudflare as their authoritative DNS servers. Cloudflare has an in-depth guide to [doing this here](https://developers.cloudflare.com/dns/zone-setups/full-setup/setup/).
-
-
-## Viewing Results
-
-The following command can be used to view and query all the results in an authenticated browser session:
-
-```bash
-CONFIG_FILE=/config.yml make open_heroku_console
-```
-
-## Adding and Removing Targets
-
-The `of-CORS` configuration file is intended to support flexible addition and removal of domains that attacks are launched for. Simply update the contents of the `hosts` section in your configuration file and re-run the provisioning script:
-
-```bash
-source venv/bin/activate
-CONFIG_FILE=/tmp/of_cors_config.yml make deploy_and_configure
-```
-
 
 ### Confirming Everything is Set Up Correctly
 
@@ -197,3 +177,20 @@ Now navigate back to the dashboard page and change the `Success` filter to filte
 ![Full Dashboard](files/full_dash.png)
 
 Your trap is set! Now just sit back and relax and wait for your victims to stumble upon your tasty little domain.
+
+## Viewing Results
+
+The following command will generate and print a link that can be used to view and query all the results in an authenticated browser session. Simply open the link in a browser:
+
+```bash
+CONFIG_FILE=/config.yml make print_heroku_console_url
+```
+
+## Adding and Removing Targets
+
+The `of-CORS` configuration file is intended to support flexible addition and removal of domains that attacks are launched for. Simply update the contents of the `hosts` section in your configuration file and re-run the provisioning script:
+
+```bash
+source venv/bin/activate
+CONFIG_FILE=/tmp/of_cors_config.yml make deploy_and_configure
+```
