@@ -57,7 +57,7 @@ class AmassManager:
         """
         AmassManager._assert_valid_domain(domain=domain)
         _, stderr, status_code = AmassManager._invoke_amass_binary(
-            args=["enum", "-d", domain]
+            args=["enum", "-timeout", "1", "-d", domain]
         )
         if status_code != 0:
             raise AmassException(
