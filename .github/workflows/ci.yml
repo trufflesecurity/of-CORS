@@ -1,0 +1,41 @@
+name: ci
+
+on:
+  push
+
+env:
+  DEBUG: 1
+
+jobs:
+
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Clone Repo
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.10.8
+      - name: Setup Dependencies
+        run: python -m venv ./venv && source venv/bin/activate && python -m pip install --upgrade pip && pip install -r requirements.txt
+      - run: source venv/bin/activate && python --version
+      - name: Lint
+        run: source venv/bin/activate && make lint_ci
+
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Clone Repo
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.10.8
+      - name: Setup Dependencies
+        run: python -m venv ./venv && source venv/bin/activate && python -m pip install --upgrade pip && pip install -r requirements.txt
+      - run: source venv/bin/activate && python --version
+      - name: Run Tests
+        run: source venv/bin/activate && make test

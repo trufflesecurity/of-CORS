@@ -1,0 +1,15 @@
+venv
+.idea
+.mypy_cache
+htmlcov
+.pytest_cache
+__pycache__
+.DS_Store
+.coverage
+db.sqlite3
+terraform/.terraform
+terraform/.terraform.lock.hcl
+terraform/package.tar.gz
+package.tar.gz
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
