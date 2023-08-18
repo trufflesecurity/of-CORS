@@ -34,7 +34,7 @@ resource "heroku_formation" "of_cors" {
   app_id = heroku_app.of_cors.id
   type = "web"
   quantity = 1
-  size = "hobby"
+  size = "Basic"
   depends_on = [heroku_build.of_cors]
 }
 
